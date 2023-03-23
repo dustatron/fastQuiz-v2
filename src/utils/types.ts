@@ -1,6 +1,6 @@
 
 
-export const DifficultyValues = { "any": 'Any', "easy": "Easy", "medium": "Medium", "hard": "hard" } as const
+export const DifficultyValues = { "easy": "Easy", "medium": "Medium", "hard": "hard" } as const
 export type Difficulty = keyof typeof DifficultyValues
 
 export const CategoryValues = {
@@ -32,7 +32,6 @@ export const CategoryValues = {
 export type Category = keyof typeof CategoryValues
 
 export const QuestionTypeValues = {
-  "any": "Any Type",
   "multiple": "Multiple Choice",
   "boolean": "True or False"
 

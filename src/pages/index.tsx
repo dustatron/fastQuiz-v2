@@ -27,11 +27,9 @@ import { cleanAsciiString } from "../utils/helper";
 const Home: NextPage = () => {
   const animatedComponents = makeAnimated();
   const [amount, setAmount] = useState<string>("5");
-  const [category, setCategory] = useState<MultiSelectOption[]>([
-    { value: "any", label: "Any" },
-  ]);
+  const [category, setCategory] = useState<MultiSelectOption[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty>();
-  const [type, setType] = useState<QuestionType>("any");
+  const [type, setType] = useState<QuestionType>();
   const { data, isLoading, refetch } = useGetOpenTBD({
     amount,
     category,
@@ -56,7 +54,7 @@ const Home: NextPage = () => {
         <form action="" onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <FormControl>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Amount of questions per category</FormLabel>
               <Input
                 type="number"
                 value={amount}
@@ -64,9 +62,10 @@ const Home: NextPage = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>category</FormLabel>
+              <FormLabel>Category</FormLabel>
               <Select
                 isMulti
+                placeholder="Any"
                 components={animatedComponents}
                 options={categoryOptions}
                 value={category}
@@ -74,9 +73,9 @@ const Home: NextPage = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>difficulty</FormLabel>
+              <FormLabel>Difficulty</FormLabel>
               <ChakraSelect
-                placeholder="Select Difficulty"
+                placeholder="Any"
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value as Difficulty)}
               >
@@ -88,9 +87,10 @@ const Home: NextPage = () => {
               </ChakraSelect>
             </FormControl>
             <FormControl>
-              <FormLabel>type</FormLabel>
+              <FormLabel>Type</FormLabel>
               <ChakraSelect
                 value={type}
+                placeholder="Any"
                 onChange={(e) => setType(e.target.value as QuestionType)}
               >
                 {Object.entries(QuestionTypeValues).map(([key, value]) => (
@@ -100,7 +100,7 @@ const Home: NextPage = () => {
                 ))}
               </ChakraSelect>
             </FormControl>
-            <Button type="submit">Get Question</Button>
+            <Button type="submit">Build Trivia Game</Button>
           </Stack>
         </form>
       </Container>
