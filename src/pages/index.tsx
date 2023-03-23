@@ -7,25 +7,30 @@ import {
   FormControl,
   FormLabel,
   Container,
-  Select,
+  Select as ChakraSelect,
   Stack,
 } from "@chakra-ui/react";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 import useGetOpenTBD from "../apiCalls/useGetOpenTDB";
 import {
   CategoryValues,
-  Category,
   DifficultyValues,
   Difficulty,
   QuestionType,
   QuestionTypeValues,
+  MultiSelectOption,
 } from "../utils/types";
 import { v4 } from "uuid";
 import { cleanAsciiString } from "../utils/helper";
 
 const Home: NextPage = () => {
+  const animatedComponents = makeAnimated();
   const [amount, setAmount] = useState<string>("5");
-  const [category, setCategory] = useState<Category>("any");
-  const [difficulty, setDifficulty] = useState<Difficulty>("any");
+  const [category, setCategory] = useState<MultiSelectOption[]>([
+    { value: "any", label: "Any" },
+  ]);
+  const [difficulty, setDifficulty] = useState<Difficulty>();
   const [type, setType] = useState<QuestionType>("any");
   const { data, isLoading, refetch } = useGetOpenTBD({
     amount,
@@ -33,8 +38,14 @@ const Home: NextPage = () => {
     difficulty,
     type,
   });
-  console.log("data", data);
 
+  const getCategoryOptions = (options: { [key: string]: string }) => {
+    return Object.entries(options).map(([key, value]) => ({
+      value: key,
+      label: value,
+    }));
+  };
+  const categoryOptions = getCategoryOptions(CategoryValues);
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     refetch();
@@ -55,20 +66,16 @@ const Home: NextPage = () => {
             <FormControl>
               <FormLabel>category</FormLabel>
               <Select
+                isMulti
+                components={animatedComponents}
+                options={categoryOptions}
                 value={category}
-                onChange={(e) => setCategory(e.target.value as Category)}
-                defaultValue={"any"}
-              >
-                {Object.entries(CategoryValues).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {`${value}`}
-                  </option>
-                ))}
-              </Select>
+                onChange={(e) => setCategory(e as MultiSelectOption[])}
+              />
             </FormControl>
             <FormControl>
               <FormLabel>difficulty</FormLabel>
-              <Select
+              <ChakraSelect
                 placeholder="Select Difficulty"
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value as Difficulty)}
@@ -78,11 +85,11 @@ const Home: NextPage = () => {
                     {value}
                   </option>
                 ))}
-              </Select>
+              </ChakraSelect>
             </FormControl>
             <FormControl>
               <FormLabel>type</FormLabel>
-              <Select
+              <ChakraSelect
                 value={type}
                 onChange={(e) => setType(e.target.value as QuestionType)}
               >
@@ -91,7 +98,7 @@ const Home: NextPage = () => {
                     {value}
                   </option>
                 ))}
-              </Select>
+              </ChakraSelect>
             </FormControl>
             <Button type="submit">Get Question</Button>
           </Stack>
@@ -100,7 +107,8 @@ const Home: NextPage = () => {
       {isLoading && <div>...loading</div>}
       {data && (
         <div>
-          {data.results.map((item) => (
+          {data && <div>{data.length}</div>}
+          {data?.map((item) => (
             <div key={v4()}>{cleanAsciiString(item.question)}</div>
           ))}
         </div>

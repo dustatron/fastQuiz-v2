@@ -4,7 +4,6 @@ export const DifficultyValues = { "any": 'Any', "easy": "Easy", "medium": "Mediu
 export type Difficulty = keyof typeof DifficultyValues
 
 export const CategoryValues = {
-  "any": "Any Category",
   "9": "Entertainment: Books",
   "10": "Entertainment: Books",
   "11": "Entertainment: Film",
@@ -54,3 +53,5 @@ export type OpenTDBResponse = {
   response_code: number,
   results: QuestionResponse[]
 }
+
+export interface MultiSelectOption { value: string; label: string }
