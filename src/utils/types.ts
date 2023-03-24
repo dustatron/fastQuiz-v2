@@ -54,3 +54,14 @@ export type OpenTDBResponse = {
 }
 
 export interface MultiSelectOption { value: string; label: string }
+
+export type RoomData = {
+  roomId: string;
+  currentQuestion: number;
+  gameId: string;
+  isEnded: boolean;
+  isPublic: boolean;
+  isStarted: boolean;
+  roomLeaderId: string;
+  roomName: string;
+};

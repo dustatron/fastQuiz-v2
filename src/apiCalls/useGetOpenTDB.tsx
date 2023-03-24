@@ -91,10 +91,10 @@ const getQuery = ({ amount, category, difficulty, type }: GetQueryProps) => {
   if (category && category.value !== "any") {
     query.push(`category=${category.value}`);
   }
-  if (difficulty && difficulty !== "any") {
+  if (difficulty) {
     query.push(`difficulty=${difficulty}`);
   }
-  if (type && type !== "any") {
+  if (type) {
     query.push(`type=${type}`);
   }
   return query.join("&");
