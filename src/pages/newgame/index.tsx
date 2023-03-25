@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { FormEvent, FormEventHandler, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -13,31 +13,43 @@ import {
 } from "@chakra-ui/react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
-import useGetOpenTBD from "../../apiCalls/useGetOpenTDB";
+import useGetOpenTBD, { GetQueryProps } from "../../apiCalls/useGetOpenTDB";
 import {
   CategoryValues,
   DifficultyValues,
-  Difficulty,
-  QuestionType,
   QuestionTypeValues,
-  MultiSelectOption,
 } from "../../utils/types";
-import { v4 } from "uuid";
-import { cleanAsciiString } from "../../utils/helper";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import MakeGameFinish from "../../components/MakeGameFinish";
+import { Firestore } from "firebase/firestore";
 
-const MakeNewGame: NextPage = () => {
+const MakeNewGame = () => {
+  const defaultValues = {
+    amount: "5",
+    roomName: "Hugs",
+    isPublic: true,
+    category: undefined,
+    type: undefined,
+    difficulty: undefined,
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm({
+    defaultValues,
+  });
+
   const animatedComponents = makeAnimated();
-  const [gameName, setGameName] = useState<string>();
-  const [isPublic, setIsPublic] = useState(false);
-  const [amount, setAmount] = useState<string>("5");
-  const [category, setCategory] = useState<MultiSelectOption[]>([]);
-  const [difficulty, setDifficulty] = useState<Difficulty>();
-  const [type, setType] = useState<QuestionType>();
+  const [quizPayload, setQuizPayload] = useState<GetQueryProps>(defaultValues);
+
   const { data, isLoading, refetch } = useGetOpenTBD({
-    amount,
-    category,
-    difficulty,
-    type,
+    amount: quizPayload?.amount,
+    category: quizPayload?.category,
+    difficulty: quizPayload?.difficulty,
+    type: quizPayload?.type,
   });
 
   const getCategoryOptions = (options: { [key: string]: string }) => {
@@ -47,60 +59,61 @@ const MakeNewGame: NextPage = () => {
     }));
   };
   const categoryOptions = getCategoryOptions(CategoryValues);
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+
+  const onSubmit = (e: any) => {
+    setQuizPayload(e);
+    console.log("values", e);
     refetch();
   };
+
   return (
     <div>
       <Container p="5">
-        <form action="" onSubmit={handleSubmit}>
+        <form action="" onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={4}>
             <FormControl>
               <FormLabel>Game Name</FormLabel>
-              <Input
-                type="text"
-                placeholder="name your game"
-                value={gameName}
-                onChange={(e) => setGameName(e.target.value)}
-              />
+              <Input type="text" isRequired {...register("roomName")} />
             </FormControl>
             <FormControl>
+              {/* Revisit */}
               <FormLabel>Public Game</FormLabel>
-              <Switch
-                size="md"
-                isChecked={isPublic}
-                onChange={() => {
-                  setIsPublic(!isPublic);
-                }}
-              />
+              <Controller
+                control={control}
+                name="isPublic"
+                render={({ field: { onChange, value } }) => (
+                  <Switch
+                    size="md"
+                    isChecked={value}
+                    onChange={(val) => onChange(val)}
+                  />
+                )}
+              ></Controller>
             </FormControl>
             <FormControl>
               <FormLabel>Amount of questions per category</FormLabel>
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
+              <Input type="number" {...register("amount")} />
             </FormControl>
             <FormControl>
               <FormLabel>Category</FormLabel>
-              <Select
-                isMulti
-                placeholder="Any"
-                components={animatedComponents}
-                options={categoryOptions}
-                value={category}
-                onChange={(e) => setCategory(e as MultiSelectOption[])}
+              <Controller
+                control={control}
+                name="category"
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    closeMenuOnSelect={false}
+                    components={animatedComponents}
+                    isMulti
+                    options={categoryOptions}
+                    value={value}
+                    onChange={(val) => onChange(val)}
+                  />
+                )}
               />
             </FormControl>
             <FormControl>
               <FormLabel>Difficulty</FormLabel>
-              <ChakraSelect
-                placeholder="Any"
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-              >
+              <ChakraSelect placeholder="Any" {...register("difficulty")}>
                 {Object.entries(DifficultyValues).map(([key, value]) => (
                   <option key={key} value={key}>
                     {value}
@@ -110,11 +123,7 @@ const MakeNewGame: NextPage = () => {
             </FormControl>
             <FormControl>
               <FormLabel>Type</FormLabel>
-              <ChakraSelect
-                value={type}
-                placeholder="Any"
-                onChange={(e) => setType(e.target.value as QuestionType)}
-              >
+              <ChakraSelect placeholder="Any" {...register("type")}>
                 {Object.entries(QuestionTypeValues).map(([key, value]) => (
                   <option key={key} value={key}>
                     {value}
@@ -126,15 +135,10 @@ const MakeNewGame: NextPage = () => {
           </Stack>
         </form>
       </Container>
-      {isLoading && <div>...loading</div>}
-      {data && (
-        <div>
-          {data && <div>{data.length}</div>}
-          {data?.map((item) => (
-            <div key={v4()}>{cleanAsciiString(item.question)}</div>
-          ))}
-        </div>
-      )}
+      <Container>
+        {isLoading && <div>...loading</div>}
+        {data && <MakeGameFinish questions={data} quizPayload={quizPayload} />}
+      </Container>
     </div>
   );
 };

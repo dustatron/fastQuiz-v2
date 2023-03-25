@@ -10,16 +10,18 @@ import {
 
 type GetOpenTBDProps = {
   amount?: string;
-  category?: MultiSelectOption[];
+  category?: MultiSelectOption[] | any;
   difficulty?: Difficulty;
   type?: QuestionType;
 };
 
-type GetQueryProps = {
+export type GetQueryProps = {
   amount?: string;
   category?: MultiSelectOption;
   difficulty?: Difficulty;
   type?: QuestionType;
+  roomName?: string;
+  isPublic?: boolean;
 };
 
 function useGetOpenTBD({
@@ -28,12 +30,19 @@ function useGetOpenTBD({
   difficulty,
   type,
 }: GetOpenTBDProps) {
-  const fetchMany = async () => {
+  const fetchMany = async (data: any) => {
+    console.log("from fetcher", data);
     if (!category) {
-      return [];
+      const results = await fetchTrivia(
+        amount,
+        { value: "", label: "" },
+        difficulty,
+        type
+      );
+      return results.results;
     }
     if (category?.length === 0 || category[0].value === "Any") {
-      const response = await fetcher(
+      const response = await fetchTrivia(
         amount,
         { value: "", label: "" },
         difficulty,
@@ -44,7 +53,7 @@ function useGetOpenTBD({
 
     let results: QuestionResponse[] = [];
     for (let catItem in category) {
-      const questions = await fetcher(
+      const questions = await fetchTrivia(
         amount,
         category[catItem],
         difficulty,
@@ -60,26 +69,26 @@ function useGetOpenTBD({
     fetchMany,
     {
       enabled: false,
+      cacheTime: 0,
     }
   );
 }
 
 export default useGetOpenTBD;
 
-const fetcher = async (
+const fetchTrivia = async (
   amnt?: string,
   cat?: MultiSelectOption,
   diff?: Difficulty,
   typ?: QuestionType
 ) => {
-  const response = await fetch(
-    `https://opentdb.com/api.php?${getQuery({
-      amount: amnt,
-      category: cat,
-      difficulty: diff,
-      type: typ,
-    })}`
-  );
+  const queryString = getQuery({
+    amount: amnt,
+    category: cat,
+    difficulty: diff,
+    type: typ,
+  });
+  const response = await fetch(`https://opentdb.com/api.php?${queryString}`);
   return await response.json();
 };
 

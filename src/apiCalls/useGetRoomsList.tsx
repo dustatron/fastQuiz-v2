@@ -2,12 +2,11 @@ import { Firestore } from "firebase/firestore";
 import { useQuery } from "react-query";
 import { RoomData } from "../utils/types";
 import { getDocs, collection, query, where } from "firebase/firestore";
+import { firestoreDB } from "../utils/firebaseConfig";
 
-type Props = { firestore: Firestore };
-
-function useGetRoomsList({ firestore }: Props) {
+function useGetRoomsList() {
   const roomsRef = query(
-    collection(firestore, "rooms"),
+    collection(firestoreDB, "rooms"),
     where("isPublic", "==", true)
   );
 

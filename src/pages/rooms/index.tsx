@@ -10,11 +10,10 @@ import React from "react";
 import { Firestore } from "firebase/firestore";
 import { useRouter } from "next/router";
 import useGetRoomsList from "../../apiCalls/useGetRoomsList";
+import { firestoreDB } from "../../utils/firebaseConfig";
 
-type Props = { firestore: Firestore };
-
-function RoomsPage({ firestore }: Props) {
-  const { data: roomsList, isLoading } = useGetRoomsList({ firestore });
+function RoomsPage() {
+  const { data: roomsList, isLoading } = useGetRoomsList();
   const router = useRouter();
 
   return (

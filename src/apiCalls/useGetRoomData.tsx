@@ -2,19 +2,20 @@ import { Firestore } from "firebase/firestore";
 import { useQuery } from "react-query";
 import { RoomData } from "../utils/types";
 import { doc, getDoc } from "firebase/firestore";
+import { firestoreDB } from "../utils/firebaseConfig";
 
-type Props = { id: string | string[] | undefined; firestore: Firestore };
+type Props = { roomId: string | string[] | undefined };
 
-function useGetRoomData({ id, firestore }: Props) {
+function useGetRoomData({ roomId }: Props) {
   const getAndSetRoomData = async () => {
-    if (typeof id === "string") {
-      const docRef = doc(firestore, "rooms", id);
+    if (typeof roomId === "string") {
+      const docRef = doc(firestoreDB, "rooms", roomId);
       const docSnap = await getDoc(docRef);
       const results = docSnap.data() as RoomData;
       return results;
     }
   };
-  return useQuery(["roomData", id], getAndSetRoomData, { enabled: true });
+  return useQuery(["roomData", roomId], getAndSetRoomData, { enabled: true });
 }
 
 export default useGetRoomData;
