@@ -31,30 +31,28 @@ function GamePlay({ roomId }: Props) {
   const roomRef = doc(firestoreDB, "rooms", roomId);
   const playersRef = collection(firestoreDB, `rooms/${roomId}/players`);
 
-  const unsubRooms = onSnapshot(roomRef, (doc) => {
-    setRoomData({ ...(doc.data() as RoomData) });
-  });
-
-  const unsubPlayers = onSnapshot(playersRef, (querySnapshot) => {
-    let tempPlayersList: Player[] = [];
-    querySnapshot.forEach((player) => {
-      tempPlayersList.push({
-        ...player.data(),
-        id: player.id,
-      } as Player);
-    });
-    setPlayersList(tempPlayersList);
-  });
-
   useEffect(() => {
     if (localState?.name) {
       setName(localState.name);
     }
+    const unSubRooms = onSnapshot(roomRef, (doc) => {
+      setRoomData({ ...(doc.data() as RoomData) });
+    });
+
+    const unSubPlayers = onSnapshot(playersRef, (querySnapshot) => {
+      let tempPlayersList: Player[] = [];
+      querySnapshot.forEach((player) => {
+        tempPlayersList.push({
+          ...player.data(),
+          id: player.id,
+        } as Player);
+      });
+      setPlayersList(tempPlayersList);
+    });
     return () => {
-      unsubRooms();
-      unsubPlayers();
+      unSubRooms();
+      unSubPlayers();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStart = () => {
