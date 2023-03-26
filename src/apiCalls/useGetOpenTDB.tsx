@@ -13,6 +13,7 @@ type GetOpenTBDProps = {
   category?: MultiSelectOption[] | any;
   difficulty?: Difficulty;
   type?: QuestionType;
+  roomName?: string;
 };
 
 export type GetQueryProps = {
@@ -29,9 +30,13 @@ function useGetOpenTBD({
   category,
   difficulty,
   type,
+  roomName,
 }: GetOpenTBDProps) {
   const fetchMany = async (data: any) => {
     console.log("from fetcher", data);
+    if (!roomName) {
+      return [];
+    }
     if (!category) {
       const results = await fetchTrivia(
         amount,
@@ -69,7 +74,7 @@ function useGetOpenTBD({
     fetchMany,
     {
       enabled: false,
-      cacheTime: 0,
+      // cacheTime: 0,
     }
   );
 }

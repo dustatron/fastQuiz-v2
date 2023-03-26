@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -9,7 +9,6 @@ import {
   Container,
   Select as ChakraSelect,
   Stack,
-  Switch,
 } from "@chakra-ui/react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
@@ -19,14 +18,13 @@ import {
   DifficultyValues,
   QuestionTypeValues,
 } from "../../utils/types";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import MakeGameFinish from "../../components/MakeGameFinish";
-import { Firestore } from "firebase/firestore";
 
 const MakeNewGame = () => {
   const defaultValues = {
     amount: "5",
-    roomName: "Hugs",
+    roomName: "",
     isPublic: true,
     category: undefined,
     type: undefined,
@@ -50,6 +48,7 @@ const MakeNewGame = () => {
     category: quizPayload?.category,
     difficulty: quizPayload?.difficulty,
     type: quizPayload?.type,
+    roomName: quizPayload?.roomName,
   });
 
   const getCategoryOptions = (options: { [key: string]: string }) => {
@@ -59,11 +58,14 @@ const MakeNewGame = () => {
     }));
   };
   const categoryOptions = getCategoryOptions(CategoryValues);
+  useEffect(() => {
+    if (quizPayload) {
+      refetch();
+    }
+  }, [quizPayload, refetch]);
 
   const onSubmit = (e: any) => {
-    setQuizPayload(e);
-    console.log("values", e);
-    refetch();
+    setQuizPayload({ ...e, isPublic: true });
   };
 
   return (
@@ -75,8 +77,8 @@ const MakeNewGame = () => {
               <FormLabel>Game Name</FormLabel>
               <Input type="text" isRequired {...register("roomName")} />
             </FormControl>
-            <FormControl>
-              {/* Revisit */}
+            {/* // IS PUBLIC */}
+            {/* <FormControl>
               <FormLabel>Public Game</FormLabel>
               <Controller
                 control={control}
@@ -89,7 +91,7 @@ const MakeNewGame = () => {
                   />
                 )}
               ></Controller>
-            </FormControl>
+            </FormControl> */}
             <FormControl>
               <FormLabel>Amount of questions per category</FormLabel>
               <Input type="number" {...register("amount")} />

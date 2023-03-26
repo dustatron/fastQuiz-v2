@@ -1,4 +1,4 @@
-import { Box, Card, Stack, Button } from "@chakra-ui/react";
+import { Box, Card, Stack, Button, Heading } from "@chakra-ui/react";
 import { Firestore } from "firebase/firestore";
 import React from "react";
 import { GetQueryProps } from "../../apiCalls/useGetOpenTDB";
@@ -24,12 +24,14 @@ function MakeGameFinish({ questions, quizPayload }: Props) {
   return (
     <Card>
       <Stack>
+        <Heading size="sm">Game Stats</Heading>
         <Box>{questions.length} Questions</Box>
         <Box>Trivia Room name : {quizPayload?.roomName}</Box>
         <Button
           isLoading={isLoading}
-          isDisabled={isLoading}
+          isDisabled={isLoading || questions.length === 0}
           onClick={() => refetch()}
+          colorScheme="green"
         >
           Make Game
         </Button>

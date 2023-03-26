@@ -27,6 +27,8 @@ import PlayerCard from "../PlayerCard";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import ScoreCard from "../ScoreCard";
 import JoinGame from "../JoinGame";
+import QuestionCard from "../QuestionCard";
+import EndCard from "../EndCard";
 
 type Props = { roomId: string };
 
@@ -76,15 +78,33 @@ function GamePlay({ roomId }: Props) {
     playersList?.forEach((player) => {
       deleteDoc(doc(firestoreDB, `rooms/${roomId}/players/${player.id}`));
     });
-    updateDoc(roomRef, { isStarted: false, currentQuestion: 0 });
+    setHasJoined(false);
+    updateDoc(roomRef, {
+      isStarted: false,
+      currentQuestion: 0,
+      isEnded: false,
+    });
   };
 
   const handleNext = () => {
-    if (roomData) {
-      console.log("next");
+    if (
+      roomData &&
+      roomData.currentQuestion < roomData.triviaQuestions.length - 1
+    ) {
       updateDoc(roomRef, {
         currentQuestion: roomData?.currentQuestion + 1,
         isShowingScoreCard: false,
+      });
+    }
+
+    if (
+      roomData &&
+      roomData.currentQuestion === roomData.triviaQuestions.length - 1
+    ) {
+      updateDoc(roomRef, {
+        isEnded: true,
+        isShowingScoreCard: false,
+        isStarted: false,
       });
     }
   };
@@ -120,17 +140,23 @@ function GamePlay({ roomId }: Props) {
 
   return (
     <Container maxW="container.sm">
+      {roomData?.isEnded && (
+        <EndCard
+          handleRestart={handleRestart}
+          roomData={roomData}
+          playersList={playersList}
+        />
+      )}
       {roomData?.isShowingScoreCard && (
-        <Box p="4">
-          <ScoreCard
-            next={handleNext}
-            playersList={playersList}
-            roomData={roomData}
-            restart={handleRestart}
-          />
-        </Box>
+        <ScoreCard
+          next={handleNext}
+          playersList={playersList}
+          roomData={roomData}
+          restart={handleRestart}
+        />
       )}
       {!roomData?.isShowingScoreCard &&
+        !roomData?.isEnded &&
         (!roomData?.isStarted || !hasPlayers) && (
           <JoinGame
             name={name}
@@ -152,29 +178,19 @@ function GamePlay({ roomId }: Props) {
             )}
           </JoinGame>
         )}
-      {!roomData?.isShowingScoreCard && hasPlayers && roomData?.isStarted && (
-        <Card p="5" m="5">
-          <Flex justify="space-between" p="5">
-            <Box>
-              <Heading size="md">{roomData?.roomName}</Heading>
-              <Box>
-                Current Questions: {Number(roomData?.currentQuestion) + 1} of{" "}
-                {roomData?.triviaQuestions && roomData?.triviaQuestions.length}
-              </Box>
-            </Box>
-            <Button onClick={handleRestart}>Restart</Button>
-          </Flex>
-          {roomData && (
-            <Question
-              roomId={roomId}
-              roomData={roomData}
-              handleNext={handleShowScoreCard}
-              handleBack={handleBack}
-              allPlayersReady={allPlayersReady}
-            />
-          )}
-        </Card>
-      )}
+      {!roomData?.isShowingScoreCard &&
+        hasPlayers &&
+        roomData?.isStarted &&
+        !roomData.isEnded && (
+          <QuestionCard
+            allPlayersReady={allPlayersReady}
+            handleBack={handleBack}
+            handleRestart={handleRestart}
+            handleShowScoreCard={handleShowScoreCard}
+            roomData={roomData}
+            roomId={roomId}
+          />
+        )}
     </Container>
   );
 }

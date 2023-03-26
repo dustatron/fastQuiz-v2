@@ -16,7 +16,7 @@ function ScoreCard({ next, playersList, roomData, restart }: Props) {
   const currentAnswer =
     roomData?.triviaQuestions[roomData.currentQuestion].correct_answer;
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} p="5" m="5">
       <Stack direction="row" justifyContent="space-between">
         <Heading>ScoreCard</Heading>
         <Button onClick={restart}>Restart</Button>

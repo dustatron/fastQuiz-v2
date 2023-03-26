@@ -1,9 +1,10 @@
 import React from "react";
+import RoomListView from "../components/RoomListView";
 
 type Props = {};
 
 const Home = (props: Props) => {
-  return <div>Fast Quiz</div>;
+  return <RoomListView />;
 };
 
 export default Home;

@@ -87,7 +87,9 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
             <Badge colorScheme={allPlayersReady ? "green" : "blue"} p="3">
               {allPlayersReady ? "Ready" : "waiting"}
             </Badge>
-            <Button onClick={handleNext}>Next</Button>
+            <Button onClick={handleNext} isDisabled={!allPlayersReady}>
+              Next
+            </Button>
           </Flex>
         )}
       </Box>

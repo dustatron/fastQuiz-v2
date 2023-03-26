@@ -1,37 +1,8 @@
-import {
-  Center,
-  Container,
-  Heading,
-  Stack,
-  Card,
-  Button,
-} from "@chakra-ui/react";
 import React from "react";
-import { useRouter } from "next/router";
-import useGetRoomsList from "../../apiCalls/useGetRoomsList";
+import RoomListView from "../../components/RoomListView";
 
 function RoomsPage() {
-  const { data: roomsList, isLoading } = useGetRoomsList();
-  const router = useRouter();
-
-  return (
-    <Container>
-      <Center>
-        <Heading>Rooms</Heading>
-      </Center>
-      <Stack>
-        {isLoading && <div>...loading rooms</div>}
-        {roomsList?.map((room) => (
-          <Card p="5" key={room.roomId}>
-            {room.roomName}
-            <Button onClick={() => router.push(`/rooms/${room.roomId}`)}>
-              Join Room
-            </Button>
-          </Card>
-        ))}
-      </Stack>
-    </Container>
-  );
+  return <RoomListView />;
 }
 
 export default RoomsPage;

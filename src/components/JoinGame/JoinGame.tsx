@@ -51,7 +51,7 @@ const JoinGame = ({
             <InputRightElement width="4.5rem">
               <Button
                 h="1.75rem"
-                size="sm"
+                size="md"
                 onClick={handleJoinGame}
                 colorScheme="blue"
                 isDisabled={!name || hasJoined}
@@ -71,14 +71,6 @@ const JoinGame = ({
         </Button>
       </Stack>
       {children}
-      {/* {hasPlayers && (
-        <Stack direction="row">
-          {playersList &&
-            playersList.map((player) => (
-              <PlayerCard key={player.id} player={player} />
-            ))}
-        </Stack>
-      )} */}
     </Stack>
   );
 };
