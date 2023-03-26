@@ -26,6 +26,7 @@ import { firestoreDB } from "../../utils/firebaseConfig";
 import PlayerCard from "../PlayerCard";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import ScoreCard from "../ScoreCard";
+import JoinGame from "../JoinGame";
 
 type Props = { roomId: string };
 
@@ -35,6 +36,7 @@ function GamePlay({ roomId }: Props) {
   const [playersList, setPlayersList] = useState<Player[]>();
   const [isLoadingJoin, setIsLoadingJoin] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
+
   const [localState, setLocalState] = useLocalStorage(`fastQuiz-player`, {});
 
   const roomRef = doc(firestoreDB, "rooms", roomId);
@@ -130,42 +132,16 @@ function GamePlay({ roomId }: Props) {
       )}
       {!roomData?.isShowingScoreCard &&
         (!roomData?.isStarted || !hasPlayers) && (
-          <Stack p="5">
-            <Center p="5">
-              <Heading size="sm">Join Game</Heading>
-            </Center>
-            <Stack>
-              <Flex justify="space-between">
-                <InputGroup size="md">
-                  <Input
-                    pr="4.5rem"
-                    type={"text"}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your name"
-                  />
-                  <InputRightElement width="4.5rem">
-                    <Button
-                      h="1.75rem"
-                      size="sm"
-                      onClick={handleJoinGame}
-                      colorScheme="blue"
-                      isDisabled={!name || hasJoined}
-                      isLoading={isLoadingJoin}
-                    >
-                      Join
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </Flex>
-              <Button
-                onClick={handleStart}
-                colorScheme={!roomData?.isStarted ? "green" : "blue"}
-                isDisabled={!hasPlayers}
-              >
-                {!roomData?.isStarted ? "Start Game" : "restart"}
-              </Button>
-            </Stack>
+          <JoinGame
+            name={name}
+            setName={setName}
+            handleJoinGame={handleJoinGame}
+            handleStart={handleStart}
+            hasJoined={hasJoined}
+            hasPlayers={hasPlayers}
+            isLoadingJoin={isLoadingJoin}
+            isStarted={roomData?.isStarted}
+          >
             {hasPlayers && (
               <Stack direction="row">
                 {playersList &&
@@ -174,7 +150,7 @@ function GamePlay({ roomId }: Props) {
                   ))}
               </Stack>
             )}
-          </Stack>
+          </JoinGame>
         )}
       {!roomData?.isShowingScoreCard && hasPlayers && roomData?.isStarted && (
         <Card p="5" m="5">
