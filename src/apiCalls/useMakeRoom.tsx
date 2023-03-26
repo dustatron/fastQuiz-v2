@@ -20,7 +20,7 @@ function useMakeRoom({ roomData }: Props) {
         setDocId(docRef.id);
         console.log("doc", docRef);
         console.log("docID", docRef.id);
-        router.push(`/rooms/${docRef.id}`);
+        router.push(`/games/${docRef.id}`);
       })
       .catch((error) => {
         console.error(error);

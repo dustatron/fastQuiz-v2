@@ -12,7 +12,7 @@ import useGetRoomsList from "../../apiCalls/useGetRoomsList";
 import { firestoreDB } from "../../utils/firebaseConfig";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 
-function RoomListView() {
+function GameListView() {
   const { data: roomsList, isLoading, refetch } = useGetRoomsList();
   const router = useRouter();
 
@@ -31,7 +31,7 @@ function RoomListView() {
   return (
     <Container>
       <Center>
-        <Heading>Rooms</Heading>
+        <Heading>Games</Heading>
       </Center>
       <Stack>
         {isLoading && <div>...loading rooms</div>}
@@ -47,7 +47,7 @@ function RoomListView() {
               >
                 Delete
               </Button>
-              <Button onClick={() => router.push(`/rooms/${room.roomId}`)}>
+              <Button onClick={() => router.push(`/games/${room.roomId}`)}>
                 Join Room
               </Button>
             </Stack>
@@ -58,4 +58,4 @@ function RoomListView() {
   );
 }
 
-export default RoomListView;
+export default GameListView;

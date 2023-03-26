@@ -287,8 +287,8 @@ const NAV_ITEMS: Array<NavItem> = [
   //   ],
   // },
   {
-    label: "Room List",
-    href: "/rooms",
+    label: "Game List",
+    href: "/games",
   },
   {
     label: "Make Game",

@@ -1,10 +1,10 @@
 import React from "react";
-import RoomListView from "../components/RoomListView";
+import GameListView from "../components/GameListView";
 
 type Props = {};
 
 const Home = (props: Props) => {
-  return <RoomListView />;
+  return <GameListView />;
 };
 
 export default Home;

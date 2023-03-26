@@ -10,7 +10,7 @@ import {
 import { doc, updateDoc } from "firebase/firestore";
 import React, { useMemo, useState } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
-import RoomsPage from "../../pages/rooms";
+import RoomsPage from "../../pages/games";
 import { firestoreDB } from "../../utils/firebaseConfig";
 import { cleanAsciiString, shuffleList } from "../../utils/helper";
 import { RoomData, Player, answerList } from "../../utils/types";
