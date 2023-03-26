@@ -1,5 +1,5 @@
 import { Box, Button, Card, Flex, Heading } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import { RoomData } from "../../utils/types";
 import Question from "../GamePlay/Question";
 
@@ -20,17 +20,26 @@ const QuestionCard = ({
   handleBack,
   allPlayersReady,
 }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
   return (
-    <Card p="5" m="5">
+    <Card m="1">
       <Flex justify="space-between" p="5">
         <Box>
           <Heading size="md">{roomData?.roomName}</Heading>
           <Box>
-            Current Questions: {Number(roomData?.currentQuestion) + 1} of{" "}
+            Question: {Number(roomData?.currentQuestion) + 1} of{" "}
             {roomData?.triviaQuestions && roomData?.triviaQuestions.length}
           </Box>
         </Box>
-        <Button onClick={handleRestart}>Restart</Button>
+        <Button
+          isLoading={isLoading}
+          onClick={() => {
+            handleRestart();
+            setIsLoading(true);
+          }}
+        >
+          Restart
+        </Button>
       </Flex>
       {roomData && (
         <Question

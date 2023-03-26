@@ -1,6 +1,5 @@
-import { Button, Heading, Stack, Box } from "@chakra-ui/react";
-import { ST } from "next/dist/shared/lib/utils";
-import React from "react";
+import { Button, Heading, Stack, Box, Text } from "@chakra-ui/react";
+import React, { useState } from "react";
 import { cleanAsciiString } from "../../utils/helper";
 import { Player, RoomData } from "../../utils/types";
 import PlayerCard from "../PlayerCard";
@@ -13,10 +12,11 @@ type Props = {
 };
 
 function ScoreCard({ next, playersList, roomData, restart }: Props) {
+  const [isLoading, setIsLoading] = useState(false);
   const currentAnswer =
     roomData?.triviaQuestions[roomData.currentQuestion].correct_answer;
   return (
-    <Stack spacing={4} p="5" m="5">
+    <Stack spacing={4} p="2" m="1">
       <Stack direction="row" justifyContent="space-between">
         <Heading>ScoreCard</Heading>
         <Button onClick={restart}>Restart</Button>
@@ -27,7 +27,11 @@ function ScoreCard({ next, playersList, roomData, restart }: Props) {
           roomData?.triviaQuestions[roomData.currentQuestion].question!
         )}
       </Box>
-      <Box>{currentAnswer && cleanAsciiString(currentAnswer)}</Box>
+      <Box>
+        <Text fontWeight="black">
+          Answer: {currentAnswer && cleanAsciiString(currentAnswer)}
+        </Text>
+      </Box>
       <Stack spacing={4} direction="row">
         {playersList &&
           playersList.map((player) => {
@@ -42,7 +46,15 @@ function ScoreCard({ next, playersList, roomData, restart }: Props) {
             );
           })}
       </Stack>
-      <Button onClick={next}>Next</Button>
+      <Button
+        onClick={() => {
+          next();
+          setIsLoading(true);
+        }}
+        isLoading={isLoading}
+      >
+        Next
+      </Button>
     </Stack>
   );
 }

@@ -8,20 +8,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { Player, RoomData } from "../../utils/types";
-import {
-  Card,
-  Heading,
-  Box,
-  Container,
-  Stack,
-  Button,
-  Flex,
-  Center,
-  Input,
-  InputGroup,
-  InputRightElement,
-} from "@chakra-ui/react";
-import Question from "./Question";
+import { Container, Stack } from "@chakra-ui/react";
 import { firestoreDB } from "../../utils/firebaseConfig";
 import PlayerCard from "../PlayerCard";
 import useLocalStorage from "../../hooks/useLocalStorage";
@@ -81,6 +68,7 @@ function GamePlay({ roomId }: Props) {
     setHasJoined(false);
     updateDoc(roomRef, {
       isStarted: false,
+      isShowingScoreCard: false,
       currentQuestion: 0,
       isEnded: false,
     });
@@ -132,8 +120,8 @@ function GamePlay({ roomId }: Props) {
   };
 
   const allPlayersReady =
-    playersList?.filter(
-      (player) => player.answersList?.length === roomData?.currentQuestion! + 1
+    playersList?.filter((ans) =>
+      ans.answersList?.find((ans) => ans.index === roomData?.currentQuestion)
     ).length === playersList?.length;
 
   const hasPlayers = playersList?.length !== 0;
@@ -147,7 +135,7 @@ function GamePlay({ roomId }: Props) {
           playersList={playersList}
         />
       )}
-      {roomData?.isShowingScoreCard && (
+      {roomData?.isShowingScoreCard && roomData?.isStarted && (
         <ScoreCard
           next={handleNext}
           playersList={playersList}

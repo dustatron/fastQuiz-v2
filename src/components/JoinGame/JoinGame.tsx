@@ -8,7 +8,7 @@ import {
   InputRightElement,
   Stack,
 } from "@chakra-ui/react";
-import React, { Children, ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 type Props = {
   name?: string;

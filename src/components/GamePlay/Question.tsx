@@ -8,11 +8,11 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { doc, updateDoc } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import RoomsPage from "../../pages/rooms";
 import { firestoreDB } from "../../utils/firebaseConfig";
-import { cleanAsciiString } from "../../utils/helper";
+import { cleanAsciiString, shuffleList } from "../../utils/helper";
 import { RoomData, Player, answerList } from "../../utils/types";
 
 type Props = {
@@ -24,6 +24,7 @@ type Props = {
 };
 
 const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [answer, setAnswer] = useState<string>();
   const [localStorage, setLocalState] = useLocalStorage(`fastQuiz-player`, {});
   const userId = localStorage.id;
@@ -32,10 +33,15 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
   const playerRef = doc(firestoreDB, `rooms/${roomId}/players/${userId}`);
 
   const currentItem = triviaQuestions[currentQuestion];
-  const allQuestions = [
-    ...currentItem.incorrect_answers,
-    currentItem.correct_answer,
-  ];
+
+  const allQuestions = useMemo(
+    () =>
+      shuffleList([
+        ...currentItem.incorrect_answers,
+        currentItem.correct_answer,
+      ]),
+    []
+  );
 
   const handleMakeGuess = (guess: string) => {
     const isCorrect = guess === currentItem.correct_answer;
@@ -87,7 +93,14 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
             <Badge colorScheme={allPlayersReady ? "green" : "blue"} p="3">
               {allPlayersReady ? "Ready" : "waiting"}
             </Badge>
-            <Button onClick={handleNext} isDisabled={!allPlayersReady}>
+            <Button
+              onClick={() => {
+                handleNext();
+                setIsLoading(true);
+              }}
+              isLoading={isLoading}
+              colorScheme={allPlayersReady ? "green" : "purple"}
+            >
               Next
             </Button>
           </Flex>
