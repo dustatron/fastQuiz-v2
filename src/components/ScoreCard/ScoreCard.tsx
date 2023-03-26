@@ -1,17 +1,27 @@
 import { Button, Heading, Stack, Box } from "@chakra-ui/react";
+import { ST } from "next/dist/shared/lib/utils";
 import React from "react";
 import { cleanAsciiString } from "../../utils/helper";
 import { Player, RoomData } from "../../utils/types";
 import PlayerCard from "../PlayerCard";
 
-type Props = { next: () => void; playersList?: Player[]; roomData?: RoomData };
+type Props = {
+  next: () => void;
+  playersList?: Player[];
+  roomData?: RoomData;
+  restart: () => void;
+};
 
-function ScoreCard({ next, playersList, roomData }: Props) {
+function ScoreCard({ next, playersList, roomData, restart }: Props) {
   const currentAnswer =
     roomData?.triviaQuestions[roomData.currentQuestion].correct_answer;
   return (
     <Stack spacing={4}>
-      <Heading>ScoreCard</Heading>
+      <Stack direction="row" justifyContent="space-between">
+        <Heading>ScoreCard</Heading>
+        <Button onClick={restart}>Restart</Button>
+      </Stack>
+
       <Box>
         {cleanAsciiString(
           roomData?.triviaQuestions[roomData.currentQuestion].question!

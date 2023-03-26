@@ -5,6 +5,7 @@ import {
   onSnapshot,
   collection,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { Player, RoomData } from "../../utils/types";
 import {
@@ -68,7 +69,11 @@ function GamePlay({ roomId }: Props) {
   const handleStart = () => {
     updateDoc(roomRef, { isStarted: true });
   };
+
   const handleRestart = () => {
+    playersList?.forEach((player) => {
+      deleteDoc(doc(firestoreDB, `rooms/${roomId}/players/${player.id}`));
+    });
     updateDoc(roomRef, { isStarted: false, currentQuestion: 0 });
   };
 
@@ -114,15 +119,18 @@ function GamePlay({ roomId }: Props) {
   return (
     <Container maxW="container.sm">
       {roomData?.isShowingScoreCard && (
-        <ScoreCard
-          next={handleNext}
-          playersList={playersList}
-          roomData={roomData}
-        />
+        <Box p="4">
+          <ScoreCard
+            next={handleNext}
+            playersList={playersList}
+            roomData={roomData}
+            restart={handleRestart}
+          />
+        </Box>
       )}
       {!roomData?.isShowingScoreCard &&
         (!roomData?.isStarted || !hasPlayers) && (
-          <Stack>
+          <Stack p="5">
             <Center p="5">
               <Heading size="sm">Join Game</Heading>
             </Center>
@@ -169,7 +177,7 @@ function GamePlay({ roomId }: Props) {
           </Stack>
         )}
       {!roomData?.isShowingScoreCard && hasPlayers && roomData?.isStarted && (
-        <Card p="5">
+        <Card p="5" m="5">
           <Flex justify="space-between" p="5">
             <Box>
               <Heading size="md">{roomData?.roomName}</Heading>
