@@ -60,6 +60,7 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
     setAnswer(guess);
     setLocalState({
       ...localStorage,
+      lastAnswer: guess,
       answersList: newAnswerList,
       correctAnswers: newCorrectAnswerList,
       score: newScore,
@@ -67,6 +68,7 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
 
     updateDoc(playerRef, {
       answersList: newAnswerList,
+      lastAnswer: guess,
       correctAnswers: newCorrectAnswerList,
       score: newScore,
     } as Player);
@@ -100,6 +102,7 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
               }}
               isLoading={isLoading}
               colorScheme={allPlayersReady ? "green" : "purple"}
+              disabled={allPlayersReady}
             >
               Next
             </Button>

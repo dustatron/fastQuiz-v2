@@ -1,5 +1,6 @@
-import { Box, Card, Stack } from "@chakra-ui/react";
+import { Box, Card, Stack, Text } from "@chakra-ui/react";
 import React from "react";
+import { cleanAsciiString } from "../../utils/helper";
 import { Player } from "../../utils/types";
 
 type Props = {
@@ -17,6 +18,10 @@ const PlayerCard = ({ player, isCorrectAnswer }: Props) => {
       <Stack direction="row">
         <Box>{player.name} :</Box>
         <Box>{player.score}</Box>
+      </Stack>
+
+      <Stack textAlign="center">
+        <Text fontWeight="bold">{cleanAsciiString(player.lastAnswer!)}</Text>
       </Stack>
     </Card>
   );

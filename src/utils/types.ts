@@ -78,6 +78,7 @@ export type Player = {
   id: string;
   name: string;
   score?: 0,
+  lastAnswer?: string
   correctAnswers?: string[]
   answersList?: answerList[]
 };
