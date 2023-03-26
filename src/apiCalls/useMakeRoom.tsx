@@ -11,13 +11,11 @@ type Props = {
 
 function useMakeRoom({ roomData }: Props) {
   const router = useRouter();
-  const [docId, setDocId] = useState<string>();
 
   const fetcher = async () => {
     const roomsRef = collection(firestoreDB, "rooms");
     addDoc(roomsRef, roomData)
       .then((docRef) => {
-        setDocId(docRef.id);
         console.log("doc", docRef);
         console.log("docID", docRef.id);
         router.push(`/games/${docRef.id}`);

@@ -1,4 +1,4 @@
-import { Box, Button, Card, Flex, Heading } from "@chakra-ui/react";
+import { Box, Button, Card, Flex, Heading, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { RoomData } from "../../utils/types";
 import Question from "../GamePlay/Question";
@@ -26,6 +26,11 @@ const QuestionCard = ({
       <Flex justify="space-between" p="5">
         <Box>
           <Heading size="md">{roomData?.roomName}</Heading>
+          <Box>
+            <Text fontWeight="bold">
+              {roomData?.triviaQuestions[roomData.currentQuestion].category}
+            </Text>
+          </Box>
           <Box>
             Question: {Number(roomData?.currentQuestion) + 1} of{" "}
             {roomData?.triviaQuestions && roomData?.triviaQuestions.length}

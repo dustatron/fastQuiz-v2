@@ -139,7 +139,7 @@ const MakeNewGame = () => {
       </Container>
       <Container>
         {isLoading && <div>...loading</div>}
-        {data && <MakeGameFinish questions={data} quizPayload={quizPayload} />}
+        {data && <Box> Sending you to your game </Box>}
       </Container>
     </div>
   );

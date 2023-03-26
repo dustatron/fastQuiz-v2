@@ -1,11 +1,13 @@
+import { addDoc, collection } from "firebase/firestore";
+import { NextRouter, useRouter } from "next/router";
 import { useQuery } from "react-query";
+import { firestoreDB } from "../utils/firebaseConfig";
 import {
-  Category,
   QuestionType,
   Difficulty,
-  OpenTDBResponse,
   MultiSelectOption,
   QuestionResponse,
+  RoomData,
 } from "../utils/types";
 
 type GetOpenTBDProps = {
@@ -32,19 +34,33 @@ function useGetOpenTBD({
   type,
   roomName,
 }: GetOpenTBDProps) {
+  const router = useRouter();
+
   const fetchMany = async (data: any) => {
     console.log("from fetcher", data);
     if (!roomName) {
       return [];
     }
     if (!category) {
-      const results = await fetchTrivia(
+      const response = await fetchTrivia(
         amount,
         { value: "", label: "" },
         difficulty,
         type
       );
-      return results.results;
+      makeFirebaseGame(
+        {
+          currentQuestion: 0,
+          isEnded: false,
+          isPublic: true,
+          isStarted: false,
+          roomName,
+          triviaQuestions: response.results,
+          isShowingScoreCard: false,
+        },
+        router
+      );
+      return response.results;
     }
     if (category?.length === 0 || category[0].value === "Any") {
       const response = await fetchTrivia(
@@ -52,6 +68,18 @@ function useGetOpenTBD({
         { value: "", label: "" },
         difficulty,
         type
+      );
+      makeFirebaseGame(
+        {
+          currentQuestion: 0,
+          isEnded: false,
+          isPublic: true,
+          isStarted: false,
+          roomName,
+          triviaQuestions: response.results,
+          isShowingScoreCard: false,
+        },
+        router
       );
       return response.results;
     }
@@ -66,6 +94,18 @@ function useGetOpenTBD({
       );
       results = [...results, ...questions.results];
     }
+    makeFirebaseGame(
+      {
+        currentQuestion: 0,
+        isEnded: false,
+        isPublic: true,
+        isStarted: false,
+        roomName,
+        triviaQuestions: results,
+        isShowingScoreCard: false,
+      },
+      router
+    );
     return results;
   };
 
@@ -112,4 +152,17 @@ const getQuery = ({ amount, category, difficulty, type }: GetQueryProps) => {
     query.push(`type=${type}`);
   }
   return query.join("&");
+};
+
+const makeFirebaseGame = async (roomData: RoomData, router: NextRouter) => {
+  const roomsRef = collection(firestoreDB, "rooms");
+  addDoc(roomsRef, roomData)
+    .then((docRef) => {
+      console.log("doc", docRef);
+      console.log("docID", docRef.id);
+      router.push(`/games/${docRef.id}`);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };

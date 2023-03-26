@@ -102,7 +102,7 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
               }}
               isLoading={isLoading}
               colorScheme={allPlayersReady ? "green" : "purple"}
-              disabled={allPlayersReady}
+              isDisabled={!allPlayersReady}
             >
               Next
             </Button>

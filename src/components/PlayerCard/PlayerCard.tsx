@@ -6,9 +6,10 @@ import { Player } from "../../utils/types";
 type Props = {
   player: Player;
   isCorrectAnswer?: boolean;
+  isEnd?: boolean;
 };
 
-const PlayerCard = ({ player, isCorrectAnswer }: Props) => {
+const PlayerCard = ({ player, isCorrectAnswer, isEnd }: Props) => {
   return (
     <Card
       key={player.id}
@@ -19,10 +20,13 @@ const PlayerCard = ({ player, isCorrectAnswer }: Props) => {
         <Box>{player.name} :</Box>
         <Box>{player.score}</Box>
       </Stack>
-
-      <Stack textAlign="center">
-        <Text fontWeight="bold">{cleanAsciiString(player.lastAnswer!)}</Text>
-      </Stack>
+      {!isEnd && (
+        <Stack textAlign="center">
+          {player.lastAnswer && (
+            <Text fontWeight="bold">{cleanAsciiString(player.lastAnswer)}</Text>
+          )}
+        </Stack>
+      )}
     </Card>
   );
 };
