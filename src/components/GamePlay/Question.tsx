@@ -1,45 +1,92 @@
-import { Button, Box, Stack, Flex, Container, Center } from "@chakra-ui/react";
-import React from "react";
+import {
+  Button,
+  Box,
+  Stack,
+  Flex,
+  Container,
+  Center,
+  Badge,
+} from "@chakra-ui/react";
+import { doc, updateDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import useLocalStorage from "../../hooks/useLocalStorage";
 import RoomsPage from "../../pages/rooms";
+import { firestoreDB } from "../../utils/firebaseConfig";
 import { cleanAsciiString } from "../../utils/helper";
-import { RoomData } from "../../utils/types";
+import { RoomData, Player, answerList } from "../../utils/types";
 
 type Props = {
   roomData: RoomData;
+  roomId: string;
   handleNext: () => void;
   handleBack: () => void;
+  allPlayersReady: boolean;
 };
 
-const Question = ({ roomData, handleNext, handleBack }: Props) => {
-  const {
-    isStarted,
-    currentQuestion,
-    gameId,
-    isEnded,
-    isPublic,
-    roomName,
-    triviaQuestions,
-    roomLeaderId,
-    roomLeaderName,
-  } = roomData;
+const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
+  const [answer, setAnswer] = useState<string>();
+  const [localStorage, setLocalState] = useLocalStorage(`fastQuiz-player`, {});
+  const userId = localStorage.id;
+  const { isStarted, currentQuestion, triviaQuestions } = roomData;
+
+  const playerRef = doc(firestoreDB, `rooms/${roomId}/players/${userId}`);
+
   const currentItem = triviaQuestions[currentQuestion];
   const allQuestions = [
     ...currentItem.incorrect_answers,
     currentItem.correct_answer,
   ];
+
+  const handleMakeGuess = (guess: string) => {
+    const isCorrect = guess === currentItem.correct_answer;
+    const newScore = isCorrect ? localStorage.score + 1 : localStorage.score;
+
+    let newCorrectAnswerList = localStorage.correctAnswers;
+    if (isCorrect) {
+      newCorrectAnswerList.push(currentItem.correct_answer);
+    }
+
+    const newAnswerList = [
+      ...localStorage?.answersList,
+      { answer: guess, index: roomData.currentQuestion },
+    ];
+
+    setAnswer(guess);
+    setLocalState({
+      ...localStorage,
+      answersList: newAnswerList,
+      correctAnswers: newCorrectAnswerList,
+      score: newScore,
+    } as Player);
+
+    updateDoc(playerRef, {
+      answersList: newAnswerList,
+      correctAnswers: newCorrectAnswerList,
+      score: newScore,
+    } as Player);
+  };
+
   return (
     <Container>
       <Box>
         <Center p="4">{cleanAsciiString(currentItem.question)}</Center>
         <Stack spacing={5}>
           {allQuestions &&
-            allQuestions.map((question) => (
-              <Button key={question}>{cleanAsciiString(question)}</Button>
+            allQuestions.map((guess) => (
+              <Button
+                key={guess}
+                colorScheme={answer === guess ? "facebook" : "gray"}
+                onClick={() => handleMakeGuess(guess)}
+              >
+                {cleanAsciiString(guess)}
+              </Button>
             ))}
         </Stack>
         {isStarted && (
           <Flex justify="space-between" p="5">
-            <Button onClick={handleBack}>Back</Button>
+            <Badge colorScheme={allPlayersReady ? "green" : "blue"} p="3">
+              {allPlayersReady ? "Ready" : "waiting"}
+            </Badge>
             <Button onClick={handleNext}>Next</Button>
           </Flex>
         )}

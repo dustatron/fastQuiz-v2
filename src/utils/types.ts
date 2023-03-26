@@ -63,7 +63,21 @@ export type RoomData = {
   isPublic: boolean;
   isEnded: boolean;
   isStarted: boolean;
+  isShowingScoreCard?: boolean;
   roomLeaderId?: string;
   roomLeaderName?: string;
   triviaQuestions: QuestionResponse[];
+};
+export type answerList = {
+  answer: string;
+  index: number;
+};
+
+
+export type Player = {
+  id: string;
+  name: string;
+  score?: 0,
+  correctAnswers?: string[]
+  answersList?: answerList[]
 };
