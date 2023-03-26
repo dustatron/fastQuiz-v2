@@ -8,7 +8,8 @@ import {
   InputRightElement,
   Stack,
 } from "@chakra-ui/react";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 type Props = {
   name?: string;
@@ -20,23 +21,28 @@ type Props = {
   isStarted?: boolean;
   hasPlayers: boolean;
   children?: ReactNode;
+  roomName?: string;
 };
 
 const JoinGame = ({
   name,
   setName,
   handleJoinGame,
-  hasJoined,
   isLoadingJoin,
   handleStart,
   isStarted,
   hasPlayers,
+  roomName,
   children,
 }: Props) => {
+  const [localStorage] = useLocalStorage(`fastQuiz-player`, {});
+
   return (
     <Stack p="5">
       <Center p="5">
-        <Heading size="sm">Join Game</Heading>
+        <Heading size="md" textTransform="capitalize">
+          Join {roomName || "Game"}
+        </Heading>
       </Center>
       <Stack>
         <Flex justify="space-between">
@@ -54,7 +60,7 @@ const JoinGame = ({
                 size="md"
                 onClick={handleJoinGame}
                 colorScheme="blue"
-                isDisabled={!name || hasJoined}
+                isDisabled={!name}
                 isLoading={isLoadingJoin}
               >
                 Join

@@ -6,7 +6,7 @@ import PlayerCard from "../PlayerCard";
 type Props = {
   handleRestart: () => void;
   roomData: RoomData;
-  playersList?: Player[];
+  playersList: Set<Player>;
 };
 
 function EndCard({ handleRestart, roomData, playersList }: Props) {
@@ -15,7 +15,7 @@ function EndCard({ handleRestart, roomData, playersList }: Props) {
       <Stack p="5">
         <Heading> You Finished {roomData.roomName} Quiz </Heading>
         <Box>
-          {playersList?.map((player) => (
+          {Array.from(playersList).map((player) => (
             <PlayerCard key={player.id} player={player} />
           ))}
         </Box>

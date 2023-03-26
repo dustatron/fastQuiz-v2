@@ -10,6 +10,7 @@ type Props = {
   handleShowScoreCard: () => void;
   handleBack: () => void;
   allPlayersReady: boolean;
+  isPlayer: boolean;
 };
 
 const QuestionCard = ({
@@ -19,6 +20,7 @@ const QuestionCard = ({
   handleShowScoreCard,
   handleBack,
   allPlayersReady,
+  isPlayer,
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   return (
@@ -53,7 +55,15 @@ const QuestionCard = ({
           handleNext={handleShowScoreCard}
           handleBack={handleBack}
           allPlayersReady={allPlayersReady}
+          isPlayer={isPlayer}
         />
+      )}
+      {!isPlayer && (
+        <Card p="5" m="4" textAlign="center" backgroundColor="orange.200">
+          <Text fontWeight="bold">
+            You are not an active player in this game
+          </Text>
+        </Card>
       )}
     </Card>
   );

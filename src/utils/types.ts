@@ -4,7 +4,7 @@ export const DifficultyValues = { "easy": "Easy", "medium": "Medium", "hard": "h
 export type Difficulty = keyof typeof DifficultyValues
 
 export const CategoryValues = {
-  "9": "Entertainment: Books",
+  "9": "Entertainment: General Knowledge",
   "10": "Entertainment: Books",
   "11": "Entertainment: Film",
   "12": "Entertainment: Music",

@@ -21,8 +21,8 @@ type Props = { roomId: string };
 
 function GamePlay({ roomId }: Props) {
   const [roomData, setRoomData] = useState<RoomData>();
-  const [name, setName] = useState<string>();
-  const [playersList, setPlayersList] = useState<Player[]>();
+  const [name, setName] = useState<string>("");
+  const [playersList, setPlayersList] = useState(new Set<Player>());
   const [isLoadingJoin, setIsLoadingJoin] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
 
@@ -40,12 +40,14 @@ function GamePlay({ roomId }: Props) {
     });
 
     const unSubPlayers = onSnapshot(playersRef, (querySnapshot) => {
-      let tempPlayersList: Player[] = [];
+      let tempPlayersList = new Set<Player>();
+      let tempPlayerNames = new Set<string>();
       querySnapshot.forEach((player) => {
-        tempPlayersList.push({
+        tempPlayersList.add({
           ...player.data(),
           id: player.id,
         } as Player);
+        tempPlayerNames.add(player.data().name);
       });
       setPlayersList(tempPlayersList);
     });
@@ -108,8 +110,20 @@ function GamePlay({ roomId }: Props) {
   };
 
   const handleJoinGame = () => {
+    const nameList = Array.from(playersList).map((player) => player.name);
+    if (name && !!nameList?.includes(name)) {
+      return null;
+    }
     setIsLoadingJoin(true);
-    const newPlayer = { name, score: 0, correctAnswers: [], answersList: [] };
+    const newPlayer = {
+      name,
+      score: 0,
+      correctAnswers: [],
+      answersList: [],
+      id: localState.id,
+      lastAnswer: "",
+    } as Player;
+
     addDoc(playersRef, newPlayer).then((player) => {
       setLocalState({ ...newPlayer, id: player.id } as Player);
       setIsLoadingJoin(false);
@@ -118,12 +132,16 @@ function GamePlay({ roomId }: Props) {
   };
 
   const allPlayersReady =
-    playersList?.filter((ans) =>
-      ans.answersList?.find((ans) => ans.index === roomData?.currentQuestion)
-    ).length === playersList?.length;
+    Array.from(playersList)?.filter((answer) =>
+      answer.answersList?.find((ans) => ans.index === roomData?.currentQuestion)
+    ).length === playersList.size;
 
-  const hasPlayers = playersList?.length !== 0;
+  const hasPlayers = playersList.size !== 0;
 
+  const isPlayer = !!Array.from(playersList).find(
+    (player) => player.id === localState.id
+  );
+  console.log("not Player", isPlayer);
   return (
     <Container maxW="container.sm">
       {roomData?.isEnded && (
@@ -153,13 +171,13 @@ function GamePlay({ roomId }: Props) {
             hasPlayers={hasPlayers}
             isLoadingJoin={isLoadingJoin}
             isStarted={roomData?.isStarted}
+            roomName={roomData?.roomName}
           >
             {hasPlayers && (
               <Stack direction="row">
-                {playersList &&
-                  playersList.map((player) => (
-                    <PlayerCard key={player.id} player={player} />
-                  ))}
+                {Array.from(playersList).map((player) => (
+                  <PlayerCard key={player.id} player={player} />
+                ))}
               </Stack>
             )}
           </JoinGame>
@@ -175,6 +193,7 @@ function GamePlay({ roomId }: Props) {
             handleShowScoreCard={handleShowScoreCard}
             roomData={roomData}
             roomId={roomId}
+            isPlayer={isPlayer}
           />
         )}
     </Container>

@@ -21,9 +21,16 @@ type Props = {
   handleNext: () => void;
   handleBack: () => void;
   allPlayersReady: boolean;
+  isPlayer: boolean;
 };
 
-const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
+const Question = ({
+  roomData,
+  handleNext,
+  allPlayersReady,
+  roomId,
+  isPlayer,
+}: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [answer, setAnswer] = useState<string>();
   const [localStorage, setLocalState] = useLocalStorage(`fastQuiz-player`, {});
@@ -85,12 +92,13 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
                 key={guess}
                 colorScheme={answer === guess ? "facebook" : "gray"}
                 onClick={() => handleMakeGuess(guess)}
+                isDisabled={!isPlayer}
               >
                 {cleanAsciiString(guess)}
               </Button>
             ))}
         </Stack>
-        {isStarted && (
+        {isStarted && isPlayer && (
           <Flex justify="space-between" p="5">
             <Badge colorScheme={allPlayersReady ? "green" : "blue"} p="3">
               {allPlayersReady ? "Ready" : "waiting"}
@@ -101,7 +109,7 @@ const Question = ({ roomData, handleNext, allPlayersReady, roomId }: Props) => {
                 setIsLoading(true);
               }}
               isLoading={isLoading}
-              colorScheme={allPlayersReady ? "green" : "purple"}
+              colorScheme={allPlayersReady ? "green" : "gray"}
               isDisabled={!allPlayersReady}
             >
               Next

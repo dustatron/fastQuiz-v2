@@ -1,4 +1,4 @@
-import { Button, Heading, Stack, Box, Text } from "@chakra-ui/react";
+import { Button, Heading, Stack, Box, Text, Divider } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { cleanAsciiString } from "../../utils/helper";
 import { Player, RoomData } from "../../utils/types";
@@ -6,7 +6,7 @@ import PlayerCard from "../PlayerCard";
 
 type Props = {
   next: () => void;
-  playersList?: Player[];
+  playersList: Set<Player>;
   roomData?: RoomData;
   restart: () => void;
 };
@@ -32,21 +32,22 @@ function ScoreCard({ next, playersList, roomData, restart }: Props) {
           Answer: {currentAnswer && cleanAsciiString(currentAnswer)}
         </Text>
       </Box>
+      <Divider />
       <Stack spacing={4} direction="row">
-        {playersList &&
-          playersList.map((player) => {
-            const isCorrectAnswer =
-              currentAnswer && player.correctAnswers?.includes(currentAnswer);
-            return (
-              <PlayerCard
-                player={player}
-                key={player.id}
-                isCorrectAnswer={!!isCorrectAnswer}
-              />
-            );
-          })}
+        {Array.from(playersList).map((player) => {
+          const isCorrectAnswer =
+            currentAnswer && player.correctAnswers?.includes(currentAnswer);
+          return (
+            <PlayerCard
+              player={player}
+              key={player.id}
+              isCorrectAnswer={!!isCorrectAnswer}
+            />
+          );
+        })}
       </Stack>
       <Button
+        colorScheme="blue"
         onClick={() => {
           next();
           setIsLoading(true);
