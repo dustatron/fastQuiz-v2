@@ -1,17 +1,8 @@
+import { decode } from 'html-entities';
+
 export const cleanAsciiString = (string: string) => {
   if (string) {
-    return string
-      .replace(/&quot;/g, '"')
-      .replace(/&ldquo;/g, '"')
-      .replace(/&rdquo;/g, '"')
-      .replace(/&#039;/g, "'")
-      .replace(/&rsquo;/g, "'")
-      .replace(/&amp;/g, "&")
-      .replace(/&ouml;/g, "ö")
-      .replace(/&eacute;/g, "ê")
-      .replace(/&uuml;/g, "ü")
-      .replace(/&sup2;/g, "²")
-      .replace(/&Eacute;/g, "É");
+    return decode(string)
   }
   return ""
 };

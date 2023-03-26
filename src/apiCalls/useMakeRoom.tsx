@@ -9,6 +9,9 @@ type Props = {
   roomData: RoomData;
 };
 
+// This hook may not be needed anymore
+// Its functionality was included in useGetOpenTDB
+
 function useMakeRoom({ roomData }: Props) {
   const router = useRouter();
 

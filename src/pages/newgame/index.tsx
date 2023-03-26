@@ -1,4 +1,3 @@
-import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -19,7 +18,6 @@ import {
   QuestionTypeValues,
 } from "../../utils/types";
 import { Controller, useForm } from "react-hook-form";
-import MakeGameFinish from "../../components/MakeGameFinish";
 
 const MakeNewGame = () => {
   const defaultValues = {
@@ -77,7 +75,7 @@ const MakeNewGame = () => {
               <FormLabel>Game Name</FormLabel>
               <Input type="text" isRequired {...register("roomName")} />
             </FormControl>
-            {/* // IS PUBLIC */}
+            {/* // IS PUBLIC: probably remove this */}
             {/* <FormControl>
               <FormLabel>Public Game</FormLabel>
               <Controller
@@ -133,7 +131,9 @@ const MakeNewGame = () => {
                 ))}
               </ChakraSelect>
             </FormControl>
-            <Button type="submit">Build Trivia Game</Button>
+            <Button type="submit" colorScheme="blue">
+              Build Trivia Game
+            </Button>
           </Stack>
         </form>
       </Container>

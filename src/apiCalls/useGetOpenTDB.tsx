@@ -37,7 +37,6 @@ function useGetOpenTBD({
   const router = useRouter();
 
   const fetchMany = async (data: any) => {
-    console.log("from fetcher", data);
     if (!roomName) {
       return [];
     }
@@ -48,18 +47,7 @@ function useGetOpenTBD({
         difficulty,
         type
       );
-      makeFirebaseGame(
-        {
-          currentQuestion: 0,
-          isEnded: false,
-          isPublic: true,
-          isStarted: false,
-          roomName,
-          triviaQuestions: response.results,
-          isShowingScoreCard: false,
-        },
-        router
-      );
+      makeFirebaseGame(response.results, roomName, router);
       return response.results;
     }
     if (category?.length === 0 || category[0].value === "Any") {
@@ -69,18 +57,7 @@ function useGetOpenTBD({
         difficulty,
         type
       );
-      makeFirebaseGame(
-        {
-          currentQuestion: 0,
-          isEnded: false,
-          isPublic: true,
-          isStarted: false,
-          roomName,
-          triviaQuestions: response.results,
-          isShowingScoreCard: false,
-        },
-        router
-      );
+      makeFirebaseGame(response.results, roomName, router);
       return response.results;
     }
 
@@ -94,27 +71,15 @@ function useGetOpenTBD({
       );
       results = [...results, ...questions.results];
     }
-    makeFirebaseGame(
-      {
-        currentQuestion: 0,
-        isEnded: false,
-        isPublic: true,
-        isStarted: false,
-        roomName,
-        triviaQuestions: results,
-        isShowingScoreCard: false,
-      },
-      router
-    );
+    makeFirebaseGame(results, roomName, router);
     return results;
   };
 
   return useQuery<QuestionResponse[]>(
-    ["quiz", amount, category, difficulty, type],
+    ["quiz", amount, category, difficulty, type, roomName],
     fetchMany,
     {
       enabled: false,
-      // cacheTime: 0,
     }
   );
 }
@@ -154,12 +119,23 @@ const getQuery = ({ amount, category, difficulty, type }: GetQueryProps) => {
   return query.join("&");
 };
 
-const makeFirebaseGame = async (roomData: RoomData, router: NextRouter) => {
+const makeFirebaseGame = async (
+  results: QuestionResponse[],
+  roomName: string,
+  router: NextRouter
+) => {
+  const roomData = {
+    currentQuestion: 0,
+    isEnded: false,
+    isPublic: true,
+    isStarted: false,
+    roomName,
+    triviaQuestions: results,
+    isShowingScoreCard: false,
+  };
   const roomsRef = collection(firestoreDB, "rooms");
   addDoc(roomsRef, roomData)
     .then((docRef) => {
-      console.log("doc", docRef);
-      console.log("docID", docRef.id);
       router.push(`/games/${docRef.id}`);
     })
     .catch((error) => {
