@@ -114,6 +114,7 @@ function GamePlay({ roomId }: Props) {
           handleRestart={handleRestart}
           roomData={roomData}
           playersList={playersList}
+          roomId={roomId}
         />
       )}
       {roomData?.isShowingScoreCard && roomData?.isStarted && (

@@ -69,7 +69,7 @@ export default function WithSubnavigation() {
           </Flex>
         </Flex>
 
-        {/* <Stack
+        <Stack
           flex={{ base: 1, md: 0 }}
           justify={"flex-end"}
           direction={"row"}
@@ -77,28 +77,19 @@ export default function WithSubnavigation() {
         >
           <Button
             as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"#"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={"a"}
             display={{ base: "none", md: "inline-flex" }}
             fontSize={"sm"}
             fontWeight={600}
             color={"white"}
-            bg={"pink.400"}
-            href={"#"}
+            bg={"gray.500"}
+            href={"https://github.com/dustatron/fastQuiz-v2"}
             _hover={{
-              bg: "pink.300",
+              bg: "gray.400",
             }}
           >
-            Sign Up
+            GitHub Repo
           </Button>
-        </Stack> */}
+        </Stack>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>

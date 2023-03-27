@@ -16,6 +16,7 @@ type GetOpenTBDProps = {
   difficulty?: Difficulty;
   type?: QuestionType;
   roomName?: string;
+  roomId?: string;
 };
 
 export type GetQueryProps = {
@@ -33,6 +34,7 @@ function useGetOpenTBD({
   difficulty,
   type,
   roomName,
+  roomId,
 }: GetOpenTBDProps) {
   const router = useRouter();
 

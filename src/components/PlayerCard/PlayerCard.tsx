@@ -5,11 +5,12 @@ import { Player } from "../../utils/types";
 
 type Props = {
   player: Player;
-  isCorrectAnswer?: boolean;
+  correctAnswer?: string;
   isEnd?: boolean;
 };
 
-const PlayerCard = ({ player, isCorrectAnswer, isEnd }: Props) => {
+const PlayerCard = ({ player, correctAnswer, isEnd }: Props) => {
+  const isCorrectAnswer = correctAnswer === player.lastAnswer;
   return (
     <Card
       key={player.id}

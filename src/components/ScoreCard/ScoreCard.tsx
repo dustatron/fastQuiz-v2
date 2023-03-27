@@ -40,17 +40,13 @@ function ScoreCard({
       </Box>
       <Divider />
       <Stack spacing={4} direction="row">
-        {Array.from(playersList).map((player) => {
-          const isCorrectAnswer =
-            currentAnswer && player.correctAnswers?.includes(currentAnswer);
-          return (
-            <PlayerCard
-              player={player}
-              key={player.id}
-              isCorrectAnswer={!!isCorrectAnswer}
-            />
-          );
-        })}
+        {Array.from(playersList).map((player) => (
+          <PlayerCard
+            player={player}
+            key={player.id}
+            correctAnswer={currentAnswer}
+          />
+        ))}
       </Stack>
       <Button
         colorScheme="blue"
