@@ -16,7 +16,7 @@ type Props = {
 function NewGameForm({ roomId }: Props) {
   const { data: roomData } = useGetRoomData({ roomId });
   return (
-    <Container>
+    <Container paddingTop="3">
       <Tabs variant="enclosed">
         <TabList>
           <Tab>Trivia DB</Tab>

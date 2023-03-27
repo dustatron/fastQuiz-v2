@@ -5,9 +5,13 @@ import {
   Input,
   FormControl,
   FormLabel,
-  Container,
   Select as ChakraSelect,
   Stack,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import makeAnimated from "react-select/animated";
 import Select from "react-select";
@@ -50,7 +54,11 @@ function TriviaDBForm({ roomData }: Props) {
     defaultValues,
   });
 
-  const { data: randomWords, refetch: getRandomName } = useGetRandomWords();
+  const {
+    data: randomWords,
+    refetch: getRandomName,
+    isLoading: isRandomQuestionLoading,
+  } = useGetRandomWords();
 
   const { data, isLoading, refetch } = useGetOpenTBD({
     amount: quizPayload?.amount,
@@ -90,9 +98,16 @@ function TriviaDBForm({ roomData }: Props) {
         <Stack spacing={4}>
           <FormControl>
             <FormLabel>Game Name</FormLabel>
-            <Stack direction="row">
-              <Input type="text" isRequired {...register("roomName")} />
-              <Button m="4" onClick={() => getRandomName()}>
+            <Stack direction="row" spacing={3}>
+              <Input
+                type="text"
+                isRequired
+                {...register("roomName")}
+                placeholder={
+                  isRandomQuestionLoading ? "...retrieving random work" : ""
+                }
+              />
+              <Button onClick={() => getRandomName()} px="5">
                 Random
               </Button>
             </Stack>
