@@ -16,12 +16,12 @@ type Props = {
   setName: (name: string) => void;
   handleJoinGame: () => void;
   handleStart: () => void;
-  hasJoined: boolean;
   isLoadingJoin: boolean;
   isStarted?: boolean;
   hasPlayers: boolean;
   children?: ReactNode;
   roomName?: string;
+  isPlayer: boolean;
 };
 
 const JoinGame = ({
@@ -34,9 +34,13 @@ const JoinGame = ({
   hasPlayers,
   roomName,
   children,
+  isPlayer,
 }: Props) => {
-  const [localStorage] = useLocalStorage(`fastQuiz-player`, {});
-
+  useEffect(() => {
+    if (!isPlayer) {
+      handleJoinGame();
+    }
+  }, []);
   return (
     <Stack p="5">
       <Center p="5">

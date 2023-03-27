@@ -8,6 +8,7 @@ import {
   Container,
   Select as ChakraSelect,
   Stack,
+  Center,
 } from "@chakra-ui/react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
@@ -18,6 +19,7 @@ import {
   QuestionTypeValues,
 } from "../../utils/types";
 import { Controller, useForm } from "react-hook-form";
+import useGetRandomWords from "../../apiCalls/useGetRandomWords";
 
 const MakeNewGame = () => {
   const defaultValues = {
@@ -34,12 +36,15 @@ const MakeNewGame = () => {
     handleSubmit,
     formState: { errors },
     control,
+    setValue,
   } = useForm({
     defaultValues,
   });
 
   const animatedComponents = makeAnimated();
   const [quizPayload, setQuizPayload] = useState<GetQueryProps>(defaultValues);
+
+  const { data: randomWords, refetch: getRandomName } = useGetRandomWords();
 
   const { data, isLoading, refetch } = useGetOpenTBD({
     amount: quizPayload?.amount,
@@ -62,6 +67,12 @@ const MakeNewGame = () => {
     }
   }, [quizPayload, refetch]);
 
+  useEffect(() => {
+    if (randomWords) {
+      setValue("roomName", randomWords);
+    }
+  }, [randomWords, setValue]);
+
   const onSubmit = (e: any) => {
     setQuizPayload({ ...e, isPublic: true });
   };
@@ -73,7 +84,12 @@ const MakeNewGame = () => {
           <Stack spacing={4}>
             <FormControl>
               <FormLabel>Game Name</FormLabel>
-              <Input type="text" isRequired {...register("roomName")} />
+              <Stack direction="row">
+                <Input type="text" isRequired {...register("roomName")} />
+                <Button m="4" onClick={() => getRandomName()}>
+                  Random
+                </Button>
+              </Stack>
             </FormControl>
             {/* // IS PUBLIC: probably remove this */}
             {/* <FormControl>
@@ -139,7 +155,7 @@ const MakeNewGame = () => {
       </Container>
       <Container>
         {isLoading && <div>...loading</div>}
-        {data && <Box> Sending you to your game </Box>}
+        {data && data.length > 0 && <Box> Sending you to your game </Box>}
       </Container>
     </div>
   );

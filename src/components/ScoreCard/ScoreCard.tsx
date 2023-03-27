@@ -9,10 +9,16 @@ type Props = {
   playersList: Set<Player>;
   roomData?: RoomData;
   restart: () => void;
+  isNextLoading: boolean;
 };
 
-function ScoreCard({ next, playersList, roomData, restart }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+function ScoreCard({
+  next,
+  playersList,
+  roomData,
+  restart,
+  isNextLoading,
+}: Props) {
   const currentAnswer =
     roomData?.triviaQuestions[roomData.currentQuestion].correct_answer;
   return (
@@ -50,9 +56,8 @@ function ScoreCard({ next, playersList, roomData, restart }: Props) {
         colorScheme="blue"
         onClick={() => {
           next();
-          setIsLoading(true);
         }}
-        isLoading={isLoading}
+        isLoading={isNextLoading}
       >
         Next
       </Button>

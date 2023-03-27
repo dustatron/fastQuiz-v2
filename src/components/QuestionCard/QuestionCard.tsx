@@ -8,7 +8,6 @@ type Props = {
   roomId: string;
   handleRestart: () => void;
   handleShowScoreCard: () => void;
-  handleBack: () => void;
   allPlayersReady: boolean;
   isPlayer: boolean;
 };
@@ -18,7 +17,6 @@ const QuestionCard = ({
   roomId,
   handleRestart,
   handleShowScoreCard,
-  handleBack,
   allPlayersReady,
   isPlayer,
 }: Props) => {
@@ -53,7 +51,6 @@ const QuestionCard = ({
           roomId={roomId}
           roomData={roomData}
           handleNext={handleShowScoreCard}
-          handleBack={handleBack}
           allPlayersReady={allPlayersReady}
           isPlayer={isPlayer}
         />

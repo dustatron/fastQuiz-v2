@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { useQuery } from "react-query";
 import { RoomData } from "../utils/types";

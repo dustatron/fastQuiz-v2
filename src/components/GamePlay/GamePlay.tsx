@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  doc,
-  updateDoc,
-  onSnapshot,
-  collection,
-  addDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import { doc, onSnapshot, collection } from "firebase/firestore";
 import { Player, RoomData } from "../../utils/types";
 import { Container, Stack } from "@chakra-ui/react";
 import { firestoreDB } from "../../utils/firebaseConfig";
@@ -16,38 +9,52 @@ import ScoreCard from "../ScoreCard";
 import JoinGame from "../JoinGame";
 import QuestionCard from "../QuestionCard";
 import EndCard from "../EndCard";
+import useAddPlayer from "../../apiCalls/useAddPlayer";
+import useUpdateNext from "../../apiCalls/useUpdateNext";
+import useDeleteUsers from "../../apiCalls/useDeleteUsers";
 
 type Props = { roomId: string };
 
 function GamePlay({ roomId }: Props) {
+  const [localState] = useLocalStorage(`fastQuiz-player`, {});
   const [roomData, setRoomData] = useState<RoomData>();
-  const [name, setName] = useState<string>("");
   const [playersList, setPlayersList] = useState(new Set<Player>());
-  const [isLoadingJoin, setIsLoadingJoin] = useState(false);
-  const [hasJoined, setHasJoined] = useState(false);
 
-  const [localState, setLocalState] = useLocalStorage(`fastQuiz-player`, {});
+  const [name, setName] = useState<string>("");
 
-  const roomRef = doc(firestoreDB, "rooms", roomId);
-  const playersRef = collection(firestoreDB, `rooms/${roomId}/players`);
+  const { mutate: addPlayer, isLoading: isLoadingAddPlayer } = useAddPlayer({
+    name,
+    playerId: localState.id,
+    roomId,
+  });
+
+  const { mutate: updateNext, isLoading: isNextLoading } = useUpdateNext({
+    roomId,
+    currentQuestion: roomData?.currentQuestion,
+    amountOfQuestions: roomData?.triviaQuestions.length,
+    nextQuestion: Number(roomData?.currentQuestion) + 1,
+  });
+
+  const { mutate: deleteRoomUsers } = useDeleteUsers({ playersList, roomId });
 
   useEffect(() => {
     if (localState?.name) {
       setName(localState.name);
     }
+
+    const roomRef = doc(firestoreDB, "rooms", roomId);
+    const playersRef = collection(firestoreDB, `rooms/${roomId}/players`);
+
     const unSubRooms = onSnapshot(roomRef, (doc) => {
       setRoomData({ ...(doc.data() as RoomData) });
     });
 
     const unSubPlayers = onSnapshot(playersRef, (querySnapshot) => {
       let tempPlayersList = new Set<Player>();
-      let tempPlayerNames = new Set<string>();
       querySnapshot.forEach((player) => {
         tempPlayersList.add({
           ...player.data(),
-          id: player.id,
         } as Player);
-        tempPlayerNames.add(player.data().name);
       });
       setPlayersList(tempPlayersList);
     });
@@ -55,80 +62,38 @@ function GamePlay({ roomId }: Props) {
       unSubRooms();
       unSubPlayers();
     };
+    //Should only run on first render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStart = () => {
-    updateDoc(roomRef, { isStarted: true });
+    updateNext({
+      action: "START",
+    });
   };
 
   const handleRestart = () => {
-    playersList?.forEach((player) => {
-      deleteDoc(doc(firestoreDB, `rooms/${roomId}/players/${player.id}`));
-    });
-    setHasJoined(false);
-    updateDoc(roomRef, {
-      isStarted: false,
-      isShowingScoreCard: false,
-      currentQuestion: 0,
-      isEnded: false,
+    deleteRoomUsers();
+
+    updateNext({
+      action: "RESTART",
     });
   };
 
   const handleNext = () => {
-    if (
-      roomData &&
-      roomData.currentQuestion < roomData.triviaQuestions.length - 1
-    ) {
-      updateDoc(roomRef, {
-        currentQuestion: roomData?.currentQuestion + 1,
-        isShowingScoreCard: false,
-      });
-    }
-
-    if (
-      roomData &&
-      roomData.currentQuestion === roomData.triviaQuestions.length - 1
-    ) {
-      updateDoc(roomRef, {
-        isEnded: true,
-        isShowingScoreCard: false,
-        isStarted: false,
-      });
-    }
+    updateNext({
+      action: "NEXT_QUESTION",
+    });
   };
 
   const handleShowScoreCard = () => {
-    updateDoc(roomRef, { isShowingScoreCard: true });
-  };
-
-  const handleBack = () => {
-    console.log("next");
-    if (roomData && roomData?.currentQuestion > 0) {
-      console.log("next +");
-      updateDoc(roomRef, { currentQuestion: roomData?.currentQuestion - 1 });
-    }
+    updateNext({
+      action: "SHOW_SCORE_CARD",
+    });
   };
 
   const handleJoinGame = () => {
-    const nameList = Array.from(playersList).map((player) => player.name);
-    if (name && !!nameList?.includes(name)) {
-      return null;
-    }
-    setIsLoadingJoin(true);
-    const newPlayer = {
-      name,
-      score: 0,
-      correctAnswers: [],
-      answersList: [],
-      id: localState.id,
-      lastAnswer: "",
-    } as Player;
-
-    addDoc(playersRef, newPlayer).then((player) => {
-      setLocalState({ ...newPlayer, id: player.id } as Player);
-      setIsLoadingJoin(false);
-      setHasJoined(true);
-    });
+    addPlayer();
   };
 
   const allPlayersReady =
@@ -141,7 +106,7 @@ function GamePlay({ roomId }: Props) {
   const isPlayer = !!Array.from(playersList).find(
     (player) => player.id === localState.id
   );
-  console.log("not Player", isPlayer);
+
   return (
     <Container maxW="container.sm">
       {roomData?.isEnded && (
@@ -157,6 +122,7 @@ function GamePlay({ roomId }: Props) {
           playersList={playersList}
           roomData={roomData}
           restart={handleRestart}
+          isNextLoading={isNextLoading}
         />
       )}
       {!roomData?.isShowingScoreCard &&
@@ -167,11 +133,11 @@ function GamePlay({ roomId }: Props) {
             setName={setName}
             handleJoinGame={handleJoinGame}
             handleStart={handleStart}
-            hasJoined={hasJoined}
             hasPlayers={hasPlayers}
-            isLoadingJoin={isLoadingJoin}
+            isLoadingJoin={isLoadingAddPlayer}
             isStarted={roomData?.isStarted}
             roomName={roomData?.roomName}
+            isPlayer={isPlayer}
           >
             {hasPlayers && (
               <Stack direction="row">
@@ -188,7 +154,6 @@ function GamePlay({ roomId }: Props) {
         !roomData.isEnded && (
           <QuestionCard
             allPlayersReady={allPlayersReady}
-            handleBack={handleBack}
             handleRestart={handleRestart}
             handleShowScoreCard={handleShowScoreCard}
             roomData={roomData}

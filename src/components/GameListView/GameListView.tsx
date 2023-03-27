@@ -11,21 +11,20 @@ import { useRouter } from "next/router";
 import useGetRoomsList from "../../apiCalls/useGetRoomsList";
 import { firestoreDB } from "../../utils/firebaseConfig";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import useDeleteGame from "../../apiCalls/useDeleteGame";
 
 function GameListView() {
   const { data: roomsList, isLoading, refetch } = useGetRoomsList();
+
+  const { mutate: deleteGame, isLoading: isDeleting } = useDeleteGame({
+    onSettled: () => {
+      refetch();
+    },
+  });
   const router = useRouter();
 
   const handelDeleteRoom = async (roomId?: string) => {
-    if (roomId) {
-      const playersRef = collection(firestoreDB, `rooms/${roomId}/players`);
-      const rooms = await getDocs(playersRef);
-      rooms.forEach((player) => {
-        deleteDoc(doc(firestoreDB, `rooms/${roomId}/players/${player.id}`));
-      });
-      deleteDoc(doc(firestoreDB, `rooms/${roomId}`));
-      refetch();
-    }
+    deleteGame(roomId);
   };
 
   return (
@@ -44,6 +43,7 @@ function GameListView() {
               <Button
                 onClick={() => handelDeleteRoom(room.roomId)}
                 colorScheme="red"
+                isLoading={isDeleting}
               >
                 Delete
               </Button>
