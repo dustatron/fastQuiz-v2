@@ -45,6 +45,7 @@ function TriviaDBForm({ roomData }: Props) {
     handleSubmit,
     formState: { errors },
     control,
+    setValue,
   } = useForm({
     defaultValues,
   });
@@ -66,6 +67,12 @@ function TriviaDBForm({ roomData }: Props) {
     }));
   };
   const categoryOptions = getCategoryOptions(CategoryValues);
+
+  useEffect(() => {
+    if (randomWords) {
+      setValue("roomName", randomWords);
+    }
+  }, [randomWords]);
 
   useEffect(() => {
     if (quizPayload) {
