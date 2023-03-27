@@ -1,4 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import useGetRandomWords from "../../apiCalls/useGetRandomWords";
+import useGetTheTriviaApi from "../../apiCalls/useGetTheTriviaApi";
+import {
+  DifficultyValues,
+  QuestionTypeValues,
+  theTriviaApiCategoriesValues,
+  theTriviaApiQueryValues,
+} from "../../utils/types";
 import {
   Box,
   Button,
@@ -11,35 +20,20 @@ import {
 } from "@chakra-ui/react";
 import makeAnimated from "react-select/animated";
 import Select from "react-select";
-import useGetOpenTBD, { GetQueryProps } from "../../apiCalls/useGetOpenTDB";
-import { Controller, useForm } from "react-hook-form";
-import useGetRandomWords from "../../apiCalls/useGetRandomWords";
-import {
-  CategoryValues,
-  DifficultyValues,
-  QuestionTypeValues,
-  RoomData,
-} from "../../utils/types";
 import { getCategoryOptions } from "../../utils/helper";
 
-type Props = {
-  roomData?: RoomData;
-};
-
-function TriviaDBForm({ roomData }: Props) {
-  const defaultValues = {
-    amount: "5",
-    roomName: roomData?.roomName,
-    isPublic: true,
-    category: undefined,
-    type: undefined,
-    difficulty: undefined,
-  };
-  const [quizPayload, setQuizPayload] = useState<GetQueryProps>(
-    roomData || defaultValues
-  );
-  const animatedComponents = makeAnimated();
-
+function TheTriviaApi() {
+  const [optionsPayload, setOptionsPayload] =
+    useState<theTriviaApiQueryValues>();
+  const { data, isLoading, refetch } = useGetTheTriviaApi({
+    optionsPayload,
+    roomName: optionsPayload?.roomName,
+  });
+  const {
+    data: randomWords,
+    refetch: getRandomName,
+    isLoading: isRandomQuestionLoading,
+  } = useGetRandomWords();
   const {
     register,
     handleSubmit,
@@ -47,47 +41,37 @@ function TriviaDBForm({ roomData }: Props) {
     control,
     setValue,
   } = useForm({
-    defaultValues,
+    defaultValues: {
+      limit: "5",
+      roomName: "",
+      isPublic: true,
+      categories: [],
+      type: undefined,
+      difficulty: undefined,
+    },
   });
 
-  const {
-    data: randomWords,
-    refetch: getRandomName,
-    isLoading: isRandomQuestionLoading,
-  } = useGetRandomWords();
-
-  const { data, isLoading, refetch } = useGetOpenTBD({
-    amount: quizPayload?.amount,
-    category: quizPayload?.category,
-    difficulty: quizPayload?.difficulty,
-    type: quizPayload?.type,
-    roomName: quizPayload?.roomName,
-    roomId: roomData?.roomId,
-  });
-
-  const categoryOptions = getCategoryOptions(CategoryValues);
+  useEffect(() => {
+    if (optionsPayload) {
+      refetch();
+    }
+  }, [optionsPayload, refetch]);
 
   useEffect(() => {
     if (randomWords) {
       setValue("roomName", randomWords);
     }
-  }, [randomWords]);
-
-  useEffect(() => {
-    if (quizPayload) {
-      refetch();
-    }
-  }, [quizPayload, refetch]);
-
+  }, [randomWords, setValue]);
   const onSubmit = (e: any) => {
-    setQuizPayload({ ...e, isPublic: true });
+    setOptionsPayload({ ...e, isPublic: true });
   };
-
+  const animatedComponents = makeAnimated();
+  const categoryOptions = getCategoryOptions(theTriviaApiCategoriesValues);
   return (
     <>
       <form action="" onSubmit={handleSubmit(onSubmit)}>
         <Heading textAlign="center" size="md" marginBlock="3">
-          Using Trivia DB
+          Using The Trivia API
         </Heading>
         <Stack spacing={4}>
           <FormControl>
@@ -106,30 +90,16 @@ function TriviaDBForm({ roomData }: Props) {
               </Button>
             </Stack>
           </FormControl>
-          {/* // IS PUBLIC: probably remove this */}
-          {/* <FormControl>
-        <FormLabel>Public Game</FormLabel>
-        <Controller
-          control={control}categoryOptions
-          name="isPublic"
-          render={({ field: { onChange, value } }) => (
-            <Switch
-              size="md"
-              isChecked={value}
-              onChange={(val) => onChange(val)}
-            />
-          )}
-        ></Controller>
-      </FormControl> */}
+
           <FormControl>
-            <FormLabel>Amount of questions per category</FormLabel>
-            <Input type="number" {...register("amount")} />
+            <FormLabel>Total amount of questions</FormLabel>
+            <Input type="number" {...register("limit")} />
           </FormControl>
           <FormControl>
             <FormLabel>Category</FormLabel>
             <Controller
               control={control}
-              name="category"
+              name="categories"
               render={({ field: { onChange, value } }) => (
                 <Select
                   closeMenuOnSelect={false}
@@ -162,7 +132,7 @@ function TriviaDBForm({ roomData }: Props) {
               ))}
             </ChakraSelect>
           </FormControl>
-          <Button type="submit" colorScheme="blue">
+          <Button type="submit" colorScheme="facebook">
             Build Trivia Game
           </Button>
         </Stack>
@@ -175,4 +145,4 @@ function TriviaDBForm({ roomData }: Props) {
   );
 }
 
-export default TriviaDBForm;
+export default TheTriviaApi;

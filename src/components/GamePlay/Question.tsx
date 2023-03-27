@@ -6,6 +6,7 @@ import {
   Container,
   Center,
   Badge,
+  Text,
 } from "@chakra-ui/react";
 import { doc, updateDoc } from "firebase/firestore";
 import React, { useMemo, useState } from "react";
@@ -91,8 +92,11 @@ const Question = ({
                 colorScheme={answer === guess ? "facebook" : "gray"}
                 onClick={() => handleMakeGuess(guess)}
                 isDisabled={!isPlayer}
+                p="4"
               >
-                {cleanAsciiString(guess)}
+                <Text w="100%" whiteSpace="normal">
+                  {cleanAsciiString(guess)}
+                </Text>
               </Button>
             ))}
         </Stack>

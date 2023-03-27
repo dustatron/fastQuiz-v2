@@ -5,6 +5,7 @@ import {
   Stack,
   Card,
   Button,
+  Box,
 } from "@chakra-ui/react";
 import React from "react";
 import { useRouter } from "next/router";
@@ -33,6 +34,11 @@ function GameListView() {
         <Heading>Games</Heading>
       </Center>
       <Stack>
+        {roomsList?.length === 0 && (
+          <Card p="3" textAlign="center" backgroundColor="orange.200">
+            No Games, Start a new game
+          </Card>
+        )}
         {isLoading && <div>...loading rooms</div>}
         {roomsList?.map((room) => (
           <Card p="5" key={room.roomId}>

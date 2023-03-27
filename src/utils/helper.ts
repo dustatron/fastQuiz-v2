@@ -13,3 +13,10 @@ export const shuffleList = (list: string[]) => {
   const listReturnedToStrings = shuffleList.map(item => item.value)
   return listReturnedToStrings
 }
+
+export const getCategoryOptions = (options: { [key: string]: string }) => {
+  return Object.entries(options).map(([key, value]) => ({
+    value: key,
+    label: value,
+  }));
+};

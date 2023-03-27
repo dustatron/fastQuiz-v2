@@ -7,6 +7,7 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import useGetRoomData from "../../apiCalls/useGetRoomData";
+import TheTriviaApi from "./TheTriviaApi";
 import TriviaDBForm from "./TriviaDBForm";
 
 type Props = {
@@ -19,15 +20,15 @@ function NewGameForm({ roomId }: Props) {
     <Container paddingTop="3">
       <Tabs variant="enclosed">
         <TabList>
-          <Tab>Trivia DB</Tab>
-          <Tab>Trivia Ninja</Tab>
+          <Tab>Open Trivia DB</Tab>
+          <Tab>The Trivia Api</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
             <TriviaDBForm roomData={roomData} />
           </TabPanel>
           <TabPanel>
-            <p>Coming Soon...</p>
+            <TheTriviaApi />
           </TabPanel>
         </TabPanels>
       </Tabs>
