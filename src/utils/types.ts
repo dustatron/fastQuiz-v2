@@ -1,6 +1,6 @@
 
 
-export const DifficultyValues = { "easy": "Easy", "medium": "Medium", "hard": "hard" } as const
+export const DifficultyValues = { "easy": "Easy", "medium": "Medium", "hard": "Hard" } as const
 export type Difficulty = keyof typeof DifficultyValues
 
 export const CategoryValues = {
