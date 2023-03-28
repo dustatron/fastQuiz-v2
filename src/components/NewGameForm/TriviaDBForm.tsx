@@ -29,7 +29,7 @@ type Props = {
 function TriviaDBForm({ roomData }: Props) {
   const defaultValues = {
     amount: "5",
-    roomName: roomData?.roomName,
+    roomName: "",
     isPublic: true,
     category: undefined,
     type: undefined,
@@ -61,17 +61,24 @@ function TriviaDBForm({ roomData }: Props) {
     category: quizPayload?.category,
     difficulty: quizPayload?.difficulty,
     type: quizPayload?.type,
-    roomName: quizPayload?.roomName,
+    roomName: roomData?.roomName || quizPayload?.roomName,
     roomId: roomData?.roomId,
   });
 
   const categoryOptions = getCategoryOptions(CategoryValues);
 
   useEffect(() => {
+    if (roomData?.roomName) {
+      setValue("roomName", roomData.roomName);
+      setValue("amount", String(roomData?.triviaQuestions?.length));
+    }
+  }, [roomData, setValue]);
+
+  useEffect(() => {
     if (randomWords) {
       setValue("roomName", randomWords);
     }
-  }, [randomWords]);
+  }, [randomWords, setValue]);
 
   useEffect(() => {
     if (quizPayload) {

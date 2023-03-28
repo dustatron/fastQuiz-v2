@@ -14,6 +14,7 @@ import {
   ModalBody,
   ModalFooter,
   Modal,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
@@ -26,13 +27,15 @@ import { RoomData } from "../../utils/types";
 
 function GameListView() {
   const [selectedRoom, setSelectedRoom] = useState<RoomData>();
+  const [isShowingConfirmDelete, setIsShowingConfirmDelete] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: roomsList, isLoading, refetch } = useGetRoomsList();
 
   const { mutate: deleteGame, isLoading: isDeleting } = useDeleteGame({
     onSettled: () => {
+      setIsShowingConfirmDelete(false);
       refetch();
-      onClose();
+      handleCloseModel();
     },
   });
   const router = useRouter();
@@ -40,7 +43,10 @@ function GameListView() {
   const handelDeleteRoom = async (roomId?: string) => {
     deleteGame(roomId);
   };
-
+  const handleCloseModel = () => {
+    onClose();
+    setIsShowingConfirmDelete(false);
+  };
   return (
     <>
       <Container mt="2">
@@ -71,7 +77,7 @@ function GameListView() {
                     isLoading={isDeleting}
                     variant="ghost"
                   >
-                    🗑️
+                    ⚙️
                   </Button>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
@@ -105,23 +111,63 @@ function GameListView() {
           ))}
         </Stack>
       </Container>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={handleCloseModel}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Delete {selectedRoom?.roomName}?</ModalHeader>
+          <ModalHeader textTransform="capitalize">
+            {selectedRoom?.roomName} Settings
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>You can not undo this action.</ModalBody>
+          <ModalBody>
+            {isShowingConfirmDelete && (
+              <Stack spacing="3">
+                {selectedRoom?.isStarted && (
+                  <Card background="orange.100" textAlign="center" p="3">
+                    <Text fontWeight="black">Unable to delete</Text>
+                    <Text fontWeight="light">
+                      This game is currently being played
+                    </Text>
+                  </Card>
+                )}
+                <Text>You can not undo this action.</Text>
+                <Button
+                  colorScheme="red"
+                  isDisabled={selectedRoom?.isStarted}
+                  onClick={() => {
+                    if (!selectedRoom?.isStarted) {
+                      handelDeleteRoom(selectedRoom?.roomId);
+                    }
+                  }}
+                  isLoading={isDeleting}
+                >
+                  Ⅹ Delete
+                </Button>
+              </Stack>
+            )}
+            {!isShowingConfirmDelete && (
+              <Stack>
+                <Button
+                  onClick={() => setIsShowingConfirmDelete(true)}
+                  colorScheme="orange"
+                >
+                  🗑️ Delete
+                </Button>
+                <Button
+                  colorScheme="linkedin"
+                  onClick={() =>
+                    router.push(`/newgame/${selectedRoom?.roomId}`)
+                  }
+                  isLoading={isDeleting}
+                >
+                  🛠️ Edit
+                </Button>
+              </Stack>
+            )}
+          </ModalBody>
 
-          <ModalFooter justifyContent="space-between">
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleCloseModel}>
               Cancel
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={() => handelDeleteRoom(selectedRoom?.roomId)}
-              isLoading={isDeleting}
-            >
-              Delete
             </Button>
           </ModalFooter>
         </ModalContent>

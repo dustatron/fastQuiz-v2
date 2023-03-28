@@ -1,4 +1,4 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { NextRouter, useRouter } from "next/router";
 import React from "react";
 import { useQuery } from "react-query";
@@ -12,9 +12,10 @@ import {
 type Props = {
   optionsPayload?: theTriviaApiQueryValues;
   roomName?: string;
+  roomId?: string;
 };
 
-function useGetTheTriviaApi({ optionsPayload, roomName }: Props) {
+function useGetTheTriviaApi({ optionsPayload, roomName, roomId }: Props) {
   const router = useRouter();
 
   const fetcher = async () => {
@@ -32,8 +33,11 @@ function useGetTheTriviaApi({ optionsPayload, roomName }: Props) {
       question: q.question,
       type: q.type,
     }));
-
-    makeFirebaseGame(resultsFormatted, router, roomName);
+    if (roomId && roomName) {
+      updateFirebaseGame(resultsFormatted, router, roomId, roomName);
+    } else {
+      makeFirebaseGame(resultsFormatted, router, roomName);
+    }
     return resultsFormatted;
   };
   return useQuery(["trivia", optionsPayload], fetcher, { enabled: false });
@@ -80,6 +84,33 @@ const makeFirebaseGame = async (
   addDoc(roomsRef, roomData)
     .then((docRef) => {
       router.push(`/games/${docRef.id}`);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+const updateFirebaseGame = async (
+  results: QuestionResponse[],
+  router: NextRouter,
+  roomId: string,
+  roomName: string
+) => {
+  if (!roomName) return null;
+  const roomData = {
+    currentQuestion: 0,
+    isEnded: false,
+    isPublic: true,
+    isStarted: false,
+    roomName,
+    triviaQuestions: results,
+    isShowingScoreCard: false,
+    roomId: roomId,
+  };
+
+  const roomRef = doc(firestoreDB, "rooms", roomId);
+  await updateDoc(roomRef, roomData)
+    .then(() => {
+      router.push(`/games/${roomId}`);
     })
     .catch((error) => {
       console.error(error);

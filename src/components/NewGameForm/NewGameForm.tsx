@@ -28,7 +28,7 @@ function NewGameForm({ roomId }: Props) {
             <TriviaDBForm roomData={roomData} />
           </TabPanel>
           <TabPanel>
-            <TheTriviaApi />
+            <TheTriviaApi roomData={roomData} />
           </TabPanel>
         </TabPanels>
       </Tabs>

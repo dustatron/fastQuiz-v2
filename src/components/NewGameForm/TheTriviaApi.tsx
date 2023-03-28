@@ -5,6 +5,7 @@ import useGetTheTriviaApi from "../../apiCalls/useGetTheTriviaApi";
 import {
   DifficultyValues,
   QuestionTypeValues,
+  RoomData,
   theTriviaApiCategoriesValues,
   theTriviaApiQueryValues,
 } from "../../utils/types";
@@ -22,12 +23,15 @@ import makeAnimated from "react-select/animated";
 import Select from "react-select";
 import { getCategoryOptions } from "../../utils/helper";
 
-function TheTriviaApi() {
+type Props = { roomData?: RoomData };
+
+function TheTriviaApi({ roomData }: Props) {
   const [optionsPayload, setOptionsPayload] =
     useState<theTriviaApiQueryValues>();
   const { data, isLoading, refetch } = useGetTheTriviaApi({
     optionsPayload,
     roomName: optionsPayload?.roomName,
+    roomId: roomData?.roomId,
   });
   const {
     data: randomWords,
@@ -52,6 +56,13 @@ function TheTriviaApi() {
   });
 
   useEffect(() => {
+    if (roomData?.roomName) {
+      setValue("roomName", roomData.roomName);
+      setValue("limit", String(roomData.triviaQuestions.length));
+    }
+  }, [roomData, setValue]);
+
+  useEffect(() => {
     if (optionsPayload) {
       refetch();
     }
@@ -62,6 +73,7 @@ function TheTriviaApi() {
       setValue("roomName", randomWords);
     }
   }, [randomWords, setValue]);
+
   const onSubmit = (e: any) => {
     setOptionsPayload({ ...e, isPublic: true });
   };
