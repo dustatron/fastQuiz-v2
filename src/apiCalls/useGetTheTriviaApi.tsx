@@ -2,6 +2,7 @@ import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { NextRouter, useRouter } from "next/router";
 import React from "react";
 import { useQuery } from "react-query";
+import { useAlertStore } from "../components/AlertCenter/AlertCenter";
 import { firestoreDB } from "../utils/firebaseConfig";
 import {
   QuestionResponse,
@@ -16,6 +17,11 @@ type Props = {
 };
 
 function useGetTheTriviaApi({ optionsPayload, roomName, roomId }: Props) {
+  const [addError, addSuccess, clearError] = useAlertStore((state) => [
+    state.addError,
+    state.addSuccess,
+    state.clearError,
+  ]);
   const router = useRouter();
 
   const fetcher = async () => {
@@ -33,12 +39,17 @@ function useGetTheTriviaApi({ optionsPayload, roomName, roomId }: Props) {
       question: q.question,
       type: q.type,
     }));
+    if (resultsFormatted.length === 0) {
+      return addError("The api returned zero questions");
+    }
+    addSuccess(`Retrieved ${resultsFormatted.length} questions`);
     if (roomId && roomName) {
       updateFirebaseGame(resultsFormatted, router, roomId, roomName);
+      return resultsFormatted;
     } else {
       makeFirebaseGame(resultsFormatted, router, roomName);
+      return resultsFormatted;
     }
-    return resultsFormatted;
   };
   return useQuery(["trivia", optionsPayload], fetcher, { enabled: false });
 }
@@ -46,11 +57,15 @@ function useGetTheTriviaApi({ optionsPayload, roomName, roomId }: Props) {
 export default useGetTheTriviaApi;
 
 const getQueryString = (options?: theTriviaApiQueryValues): string => {
+  console.log("options", options);
   const results = [];
   if (options?.limit) {
     results.push(`limit=${options.limit}`);
   }
-  if (options?.categories) {
+  if (options?.tags && options.tags.length !== 0) {
+    results.push(`tags=${options.tags.map((cat) => cat.value).join(",")}`);
+  }
+  if (options?.categories && options?.categories.length !== 0) {
     results.push(
       `categories=${options.categories.map((cat) => cat.value).join(",")}`
     );
@@ -58,9 +73,7 @@ const getQueryString = (options?: theTriviaApiQueryValues): string => {
   if (options?.difficulty) {
     results.push(`difficulty=${options.difficulty}`);
   }
-  if (options?.tags) {
-    results.push(`categories=${options.tags.join(",")}`);
-  }
+
   results.push("region=US");
   return results.join("&");
 };

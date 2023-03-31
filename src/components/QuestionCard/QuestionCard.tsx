@@ -28,7 +28,7 @@ const QuestionCard = ({
           <Heading size="md">{roomData?.roomName}</Heading>
           <Box>
             <Text fontWeight="bold">
-              {roomData?.triviaQuestions[roomData.currentQuestion].category}
+              {roomData?.triviaQuestions[roomData.currentQuestion]?.category}
             </Text>
           </Box>
           <Box>

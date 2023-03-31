@@ -8,6 +8,7 @@ import {
   RoomData,
   theTriviaApiCategoriesValues,
   theTriviaApiQueryValues,
+  theTriviaApiTags,
 } from "../../utils/types";
 import {
   Box,
@@ -52,6 +53,7 @@ function TheTriviaApi({ roomData }: Props) {
       categories: [],
       type: undefined,
       difficulty: undefined,
+      tags: [],
     },
   });
 
@@ -78,6 +80,11 @@ function TheTriviaApi({ roomData }: Props) {
     setOptionsPayload({ ...e, isPublic: true });
   };
   const animatedComponents = makeAnimated();
+  const tagOptions = theTriviaApiTags.map((item) => ({
+    value: item,
+    label: item,
+  }));
+
   const categoryOptions = getCategoryOptions(theTriviaApiCategoriesValues);
   return (
     <>
@@ -118,6 +125,23 @@ function TheTriviaApi({ roomData }: Props) {
                   components={animatedComponents}
                   isMulti
                   options={categoryOptions}
+                  value={value}
+                  onChange={(val) => onChange(val)}
+                />
+              )}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Tags</FormLabel>
+            <Controller
+              control={control}
+              name="tags"
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  closeMenuOnSelect={false}
+                  components={animatedComponents}
+                  isMulti
+                  options={tagOptions}
                   value={value}
                   onChange={(val) => onChange(val)}
                 />

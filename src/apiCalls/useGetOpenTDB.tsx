@@ -1,6 +1,7 @@
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { NextRouter, useRouter } from "next/router";
 import { useQuery } from "react-query";
+import { useAlertStore } from "../components/AlertCenter/AlertCenter";
 import { firestoreDB } from "../utils/firebaseConfig";
 import {
   QuestionType,
@@ -37,6 +38,10 @@ function useGetOpenTBD({
   roomId,
 }: GetOpenTBDProps) {
   const router = useRouter();
+  const [addSuccessAlert, addErrorAlert] = useAlertStore((store) => [
+    store.addSuccess,
+    store.addError,
+  ]);
 
   const fetchMany = async (data: any) => {
     if (!roomName) {
@@ -50,6 +55,7 @@ function useGetOpenTBD({
         difficulty,
         type
       );
+      addSuccessAlert(`Retrieved ${response.results.length} questions `);
       makeFirebaseGame({ results: response.results, roomName, router, roomId });
       return response.results;
     }
@@ -60,6 +66,7 @@ function useGetOpenTBD({
         difficulty,
         type
       );
+      addSuccessAlert(`Retrieved ${response.results.length} questions `);
       makeFirebaseGame({ results: response.results, roomName, router, roomId });
       return response.results;
     }
@@ -74,6 +81,7 @@ function useGetOpenTBD({
       );
       results = [...results, ...questions.results];
     }
+    addSuccessAlert(`Retrieved ${results.length} questions `);
     makeFirebaseGame({ results, roomName, router, roomId });
     return results;
   };

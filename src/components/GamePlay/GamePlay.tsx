@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { doc, onSnapshot, collection } from "firebase/firestore";
 import { Player, RoomData } from "../../utils/types";
-import { Container, Stack } from "@chakra-ui/react";
+import { Box, Container, Stack } from "@chakra-ui/react";
 import { firestoreDB } from "../../utils/firebaseConfig";
 import PlayerCard from "../PlayerCard";
 import useLocalStorage from "../../hooks/useLocalStorage";
@@ -72,9 +72,10 @@ function GamePlay({ roomId }: Props) {
     });
   };
 
-  const handleRestart = () => {
+  const handleDeleteUsers = () => {
     deleteRoomUsers();
-
+  };
+  const handleRestart = () => {
     updateNext({
       action: "RESTART",
     });
@@ -112,6 +113,7 @@ function GamePlay({ roomId }: Props) {
       {roomData?.isEnded && (
         <EndCard
           handleRestart={handleRestart}
+          handleDeleteUsers={handleDeleteUsers}
           roomData={roomData}
           playersList={playersList}
           roomId={roomId}
@@ -151,6 +153,7 @@ function GamePlay({ roomId }: Props) {
         )}
       {!roomData?.isShowingScoreCard &&
         hasPlayers &&
+        roomData?.triviaQuestions.length !== 0 &&
         roomData?.isStarted &&
         !roomData.isEnded && (
           <QuestionCard
@@ -162,6 +165,10 @@ function GamePlay({ roomId }: Props) {
             isPlayer={isPlayer}
           />
         )}
+      {!roomData?.isShowingScoreCard &&
+        hasPlayers &&
+        roomData?.triviaQuestions.length === 0 &&
+        roomData?.isStarted && <Box>No questions</Box>}
     </Container>
   );
 }

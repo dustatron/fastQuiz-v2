@@ -6,12 +6,19 @@ import PlayerCard from "../PlayerCard";
 
 type Props = {
   handleRestart: () => void;
+  handleDeleteUsers: () => void;
   roomData: RoomData;
   playersList: Set<Player>;
   roomId: string;
 };
 
-function EndCard({ handleRestart, roomData, playersList, roomId }: Props) {
+function EndCard({
+  handleRestart,
+  handleDeleteUsers,
+  roomData,
+  playersList,
+  roomId,
+}: Props) {
   const router = useRouter();
   return (
     <Card p="5" m="5">
@@ -25,7 +32,10 @@ function EndCard({ handleRestart, roomData, playersList, roomId }: Props) {
         </Box>
         <Button
           colorScheme="blue"
-          onClick={() => router.push(`/newgame/${roomId}`)}
+          onClick={() => {
+            handleDeleteUsers();
+            router.push(`/newgame/${roomId}`);
+          }}
         >
           New questions
         </Button>

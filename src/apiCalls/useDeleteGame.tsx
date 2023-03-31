@@ -1,23 +1,36 @@
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import React from "react";
 import { useMutation } from "react-query";
+import { useAlertStore } from "../components/AlertCenter/AlertCenter";
 import { firestoreDB } from "../utils/firebaseConfig";
 
 type Props = { onSettled: () => void };
 
 function useDeleteGame({ onSettled }: Props) {
+  const [addSuccessAlert, addErrorAlert] = useAlertStore((state) => [
+    state.addSuccess,
+    state.addError,
+  ]);
   const fetcher = async (roomId?: string) => {
     if (!roomId) return null;
     const playersRef = collection(firestoreDB, `rooms/${roomId}/players`);
-    const rooms = await getDocs(playersRef);
+    const playersList = await getDocs(playersRef);
 
     // First delete players docs in sub collection
-    rooms.forEach((player) => {
-      deleteDoc(doc(firestoreDB, `rooms/${roomId}/players/${player.id}`));
-    });
+    for (let player in playersList) {
+      await deleteDoc(
+        // @ts-ignore
+        doc(firestoreDB, `rooms/${roomId}/players/${playersList[player].id}`)
+      );
+    }
 
     // Then delete doc
-    deleteDoc(doc(firestoreDB, `rooms/${roomId}`));
+    deleteDoc(doc(firestoreDB, `rooms/${roomId}`))
+      .then(() => {
+        addSuccessAlert("Game was deleted successfully");
+      })
+      .catch(() => {
+        addErrorAlert("Could not delete game");
+      });
   };
   return useMutation(["games"], fetcher, { onSettled });
 }

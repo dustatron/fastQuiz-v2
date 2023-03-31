@@ -117,7 +117,7 @@ export type theTriviaApiQueryValues = {
   limit: number,
   categories: MultiSelectOption[],
   difficulty: theTriviaApiDifficulty,
-  tags: string[],
+  tags: MultiSelectOption[],
   region: 'US',
   roomName?: string
 }
