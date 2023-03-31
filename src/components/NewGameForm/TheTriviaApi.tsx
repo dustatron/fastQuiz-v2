@@ -174,8 +174,10 @@ function TheTriviaApi({ roomData }: Props) {
         </Stack>
       </form>
       <Box>
-        {isLoading && <div>...loading</div>}
-        {data && data.length > 0 && <Box> Sending you to your game </Box>}
+        <>
+          {isLoading && <div>...loading</div>}
+          {data && data.length > 0 && <Box> Sending you to your game </Box>}
+        </>
       </Box>
     </>
   );
